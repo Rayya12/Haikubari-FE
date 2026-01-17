@@ -3,6 +3,13 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --ateneo-blue : #0A4C68;
+  --teal : #038081;
+  --teal-Deer : #9BEAB6;
+  --lime-green: #32CD32;
+  --spring-frost : #77EB2C;
+  --bitter-lime: #BEFF00;
+
 }
 
 @theme inline {
@@ -10,6 +17,12 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --color-ateneo-blue : var(--ateneo-blue);
+  --color-teal : var(--teal);
+  --color-teal-Deer : var(--teal-Deer);
+  --color-lime-green: var(--lime-green);
+  --color-spring-frost : var(--spring-frost);
+  --color-bitter-lime: var(--bitter-lime);
 }
 
 @media (prefers-color-scheme: dark) {
