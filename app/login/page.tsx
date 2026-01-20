@@ -18,11 +18,11 @@ export default function LoginPage(){
                 <Image src="/blacklogo.png" alt="Haikubari Logo" width={500} height={500}></Image>
                 <div className="flex justify-center lg:w-1/3 sm:w-full space-x-4 p-4 border border-gray-300 rounded-lg shadow-lg">
                     <Form className="flex flex-col w-full items-center justify-center space-y-3" action={handleLogin}>
-                        <div className="flex text-black text-left w-3/4">
+                        <div className="flex text-black text-left font-bold w-3/4">
                             <label htmlFor="email" >メール</label>
                         </div>
                         <input type="email" name="email" id="email" className="w-3/4 border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-ateneo-blue text-black"></input>
-                        <div className="flex text-black text-left w-3/4">
+                        <div className="flex text-black text-left w-3/4 font-bold">
                             <label htmlFor="password">パスワード</label>
                         </div>
                         <input type="password" name="password" id="password" className="w-3/4 border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-ateneo-blue text-black"></input>
