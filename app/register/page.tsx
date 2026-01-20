@@ -7,10 +7,11 @@ import {useActionState} from 'react'
 import { handleRegister } from "../lib/action"
 import { useState } from "react"
 
+
 const initialState = { error: undefined as string | undefined }
 
 export default function Register() {
-  const [state, formAction] = useActionState(handleRegister, initialState)
+  const [state, formAction] = useActionState<typeof initialState, FormData>(handleRegister as any, initialState)
 
   // 🔹 STATE PER INPUT (INI KUNCINYA)
   const [username, setUsername] = useState('')
@@ -70,6 +71,7 @@ export default function Register() {
           <div className="flex mb-1 text-left w-3/4 text-black font-bold">
             <label htmlFor="age">年齢</label>
           </div>
+          
           <input
             type="number"
             id="age"
@@ -111,7 +113,7 @@ export default function Register() {
           {/* Error from server */}
           {state.error && (
             <div className="w-3/4 bg-red-300 p-2 rounded-md border border-red-700 text-red-950 mt-2">
-              {state.error}
+              {state.error as string}
             </div>
           )}
 

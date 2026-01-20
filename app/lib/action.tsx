@@ -2,6 +2,8 @@
 
 import { error } from "console"
 
+const backendURL = process.env.BACKEND_URL
+
 // Register action
 export async function  handleRegister(prevState : {error?:string} | null,formData:FormData) {
 
@@ -55,10 +57,32 @@ export async function  handleRegister(prevState : {error?:string} | null,formDat
         return {error:"役を入れて下さい"}
     }
 
-    // db
+    const payload = {
+        username : username,
+        email:email,
+        password:password,
+        age:age,
+        role:role,
+        is_active:true,
+        is_verified:false,
+        is_superuser:false
+    }
+
+
+    try {
+        const response = await fetch(`${backendURL}/auth/register`,{
+            method : "POST",
+            headers : {
+                'Content-Type' : 'application/json'
+            },
+            body:JSON.stringify(payload)
+        })
+    }catch(e){
+        return {error:e}
+    }
+
 
     return {error:undefined}
-
 
 
 
