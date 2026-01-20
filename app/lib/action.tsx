@@ -1,6 +1,8 @@
 'use server'
 
 import { error } from "console"
+import { redirect } from "next/navigation"
+import { cookies } from "next/headers"
 
 const backendURL = process.env.BACKEND_URL
 
@@ -49,7 +51,7 @@ export async function  handleRegister(prevState : {error?:string} | null,formDat
         return {error:"年齢を入れて下さい"}
     }
 
-    if (isNaN(age) || !Number.isInteger(age) || age <= 1 || age >= 200) {
+    if (isNaN(age) || !Number.isInteger(age) || age < 1 || age >= 200) {
         return { error: "年齢は一から二百まで入れて下さい" };
     }
 
@@ -67,24 +69,49 @@ export async function  handleRegister(prevState : {error?:string} | null,formDat
         is_verified:false,
         is_superuser:false
     }
-
-
-    try {
-        const response = await fetch(`${backendURL}/auth/register`,{
-            method : "POST",
-            headers : {
-                'Content-Type' : 'application/json'
-            },
+  
+    const responseRegist = await fetch(`${backendURL}/auth/register`,{
+        method : "POST",
+        headers : {
+            'Content-Type' : 'application/json'
+        },
             body:JSON.stringify(payload)
         })
-    }catch(e){
-        return {error:e}
+
+        if (!responseRegist.ok){
+            return {error:"登録が失敗しました"}
+        }
+    
+
+    const body = new URLSearchParams();
+    body.set("username",email)
+    body.set("password",password)
+    const response = await fetch(`${backendURL}/auth/jwt/login`,{
+        method : "POST",
+        headers : {
+            'Content-Type' : 'application/x-www-form-urlencoded'
+        },
+        body:body.toString()
+    })
+    
+    if (!response.ok){
+        return {error:"登録が失敗しました"}
     }
 
 
-    return {error:undefined}
+    const data = await response.json();
+
+    const kukis = await cookies()
+
+    kukis.set("access_token", data.access_token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/",
+  });
 
 
 
 
+    redirect(`/verifiy-otp?email=${email}`)
 }
