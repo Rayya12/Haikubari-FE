@@ -31,8 +31,8 @@ export default function LoginPage(){
                         </button>
 
                         
-                        <Link className="text-ateneo-blue hover:ring-1 hover:ring-teal" href={"/register"}>アカウントお持ちしない場合</Link>
-                        <Link className="text-ateneo-blue hover:ring-1 hover:ring-teal" href={"/forgot-password"}>パスワードをお忘れの方</Link>
+                        <Link className="text-ateneo-blue hover:font-bold" href={"/register"}>アカウントお持ちしない場合</Link>
+                        <Link className="text-ateneo-blue hover:font-bold" href={"/forgot-password"}>パスワードをお忘れの方</Link>
                 
                     </Form>
                 </div>
