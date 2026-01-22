@@ -1,7 +1,6 @@
 'use client'
 import { useSearchParams } from "next/navigation"
 import Form from "next/form"
-import { handleRegister } from "../lib/action"
 import { ChangeEvent, useActionState, useState } from "react" 
 import { handleVerifyOTP } from "../lib/action"
 import { stat } from "fs"
@@ -12,7 +11,7 @@ const initialState = {
 }
 
 export default function VerifOTP() {
-    const [state,formAction] = useActionState(handleRegister,initialState);
+    const [state,formAction] = useActionState(handleVerifyOTP,initialState);
 
     const searchParams = useSearchParams()
     const email = "halo@gmail.com"//searchParams.get("email")

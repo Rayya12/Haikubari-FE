@@ -71,6 +71,14 @@ export async function  handleRegister(prevState : {error?:string} | null,formDat
         is_verified:false,
         is_superuser:false
     }
+
+    const responseCheck = await fetch(`${backendURL}/auth/otp/check`,{
+        method : "DELETE",
+        headers : {
+            'Content-Type' : 'application/json'   
+        },
+        body:JSON.stringify({username:username,email:email})
+    })
   
     const responseRegist = await fetch(`${backendURL}/auth/register`,{
         method : "POST",
@@ -80,8 +88,8 @@ export async function  handleRegister(prevState : {error?:string} | null,formDat
             body:JSON.stringify(payload)
         })
 
-        if (!responseRegist.ok){
-            return {error:"登録が失敗しました"}
+        if (!responseRegist.ok) {
+            return { error: "ユーサネーム/メールアドレスが存在しました"}
         }
     
 
