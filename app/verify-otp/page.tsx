@@ -3,6 +3,9 @@ import { useSearchParams } from "next/navigation"
 import Form from "next/form"
 import { handleRegister } from "../lib/action"
 import { ChangeEvent, useActionState, useState } from "react" 
+import { handleVerifyOTP } from "../lib/action"
+import { stat } from "fs"
+
 
 const initialState = {
     error:undefined as string | undefined
@@ -87,6 +90,10 @@ export default function VerifOTP() {
             <input type="text" min={1} required id="five" name="five" className="p-2 border border-black text-black w-1/7 text-center rounded-md" value={five} onChange={handleFive}/>
             <input type="text" min={1} required id="six" name="six" className="p-2 border border-black text-black  w-1/7 text-center rounded-md" value={six} onChange={handleSix}/>
         </Form>
+        {state.error && (
+            <div className="flex w-3/4 items-center justify-center bg-red-300 border-red-700 text-red-950 rounded-md p-2"></div>
+        )}
+        <button type="submit" className="flex items-center justify-center p-2 bg-lime-green rounded-md shadow-md font-bold w-3/4 mt-4 text-xl hover:ring-2 hover:ring-ateneo-blue">確認</button>
       </div>
 
       

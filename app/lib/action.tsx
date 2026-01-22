@@ -3,6 +3,8 @@
 import { error } from "console"
 import { redirect } from "next/navigation"
 import { cookies } from "next/headers"
+import Link from "next/link"
+
 
 const backendURL = process.env.BACKEND_URL
 
@@ -108,10 +110,107 @@ export async function  handleRegister(prevState : {error?:string} | null,formDat
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
     path: "/",
+    });
+
+    const otp = await requestOTP(email);
+
+    redirect(`/verify-otp?email=${email}`)
+}
+
+export async function handleVerifyOTP(prevState:{error?:string},formData:FormData) {
+    const one = Number(formData.get("one"));
+    if (isNaN(one) || one < 0 || one > 9){
+        return {error:"正しいOTPを入れて下さい"}
+    }
+
+    const two = Number(formData.get("two"));
+    if (isNaN(two) || two < 0 || two > 9){
+        return {error:"正しいOTPを入れて下さい"}
+    }
+
+    const three = Number(formData.get("three"));
+    if (isNaN(three) || three < 0 || three > 9){
+        return {error:"正しいOTPを入れて下さい"}
+    }
+
+    const four = Number(formData.get("four"));
+    if (isNaN(four) || four < 0 || four > 9){
+        return {error:"正しいOTPを入れて下さい"}
+    }
+
+    const five = Number(formData.get("five"));
+    if (isNaN(five) || five < 0 || five > 9){
+        return {error:"正しいOTPを入れて下さい"}
+    }
+
+    const six = Number(formData.get("six"));
+    if (isNaN(six) || six < 0 || six > 9){
+        return {error:"正しいOTPを入れて下さい"}
+    }
+
+    const onestr = one.toString()
+    const twostr = two.toString()
+    const threestr = three.toString()
+    const fourstr = four.toString()
+    const fivestr = five.toString()
+    const sixstr = six.toString()
+
+    const finalOtp = onestr+twostr+threestr+fourstr+fivestr+sixstr
+
+    const verifyOtp = await verifyOtpAction(finalOtp)
+
+    if (!verifyOtp.ok){
+        return {error:"正しいOTPを入れて下さい"}
+    }
+
+    redirect(`verify-otp/success`)
+
+
+}
+
+export async function requestOTP(email:string){
+    const responseOtp = await fetch(`${backendURL}/auth/otp/request`,{
+        method:"POST",
+        headers: {
+            'Content-Type' : 'application/json'
+        },
+        body:JSON.stringify({email})
+    }) 
+
+    if (!responseOtp.ok) {
+        return { ok: false as const, error: "request otp failed" };
+    }
+
+    const data = (await responseOtp.json()) as { ok: boolean };
+    return data.ok ? { ok: true as const } : { ok: false as const, error: "not ok" };
+}
+
+
+
+export async function verifyOtpAction(code: string) {
+  const cookieStore = await cookies();
+
+  // forward cookie JWT ke backend
+  const access = cookieStore.get("access_token")?.value;
+
+  const res = await fetch(`${backendURL}/otp/verify`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...(access ? { cookie: `access_token=${access}` } : {}),
+    },
+    body: JSON.stringify({ code }),
+    cache: "no-store",
   });
 
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    return { ok: false as const, error: err.detail ?? "OTP invalid" };
+  }
 
-
-
-    redirect(`/verifiy-otp?email=${email}`)
+  return (await res.json()) as {
+    ok: true;
+    is_verified: true;
+  };
 }
+
