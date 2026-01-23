@@ -119,7 +119,7 @@ export default function Register() {
 
           <button
             type="submit"
-            className="flex w-3/4 bg-lime-green items-center justify-center p-2 rounded-md mt-3 text-white"
+            className="flex w-3/4 bg-lime-green items-center justify-center p-2 rounded-md mt-3 text-white hover:ring-2 ring-ateneo-blue"
           >
             アカウント登録
           </button>

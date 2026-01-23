@@ -81,18 +81,22 @@ export default function VerifOTP() {
     >
       <div className="flex flex-col w-full sm:w-3/4 lg:w-1/2 bg-white shadow-md rounded-md border border-gray-300 items-center justify-center px-4 py-8 space-y-4">
         <p className="text-black font-bold text-2xl text-center">OTPを<i>{"***"+email.slice(3)}</i>にておくしましたそうしんした<br/>OTPをこちらでいれてください</p>
-        <Form action={formAction} className="flex space-x-2 w-full items-center justify-center pt-4">
+        <Form action={formAction} className="flex flex-col space-y-2 items-center justify-center">
+            <div className="flex space-x-2 w-full items-center justify-center pt-4">
             <input type="text" min={1} required id="one" name="one" className="p-2 border border-black text-black w-1/7 text-center rounded-md" value={one} onChange={handleOne}/>
             <input type="text" min={1} required id="two" name="two"className="p-2 border border-black text-black  w-1/7 text-center rounded-md" value={two} onChange={handleTwo}/>
             <input type="text" min={1} required id="three" name="three" className="p-2 border border-black text-black  w-1/7 text-center rounded-md" value={three} onChange={handleThree}/>
             <input type="text" min={1} required id="four" name="four" className="p-2 border border-black text-black w-1/7 text-center rounded-md" value={four} onChange={handleFour}/>
             <input type="text" min={1} required id="five" name="five" className="p-2 border border-black text-black w-1/7 text-center rounded-md" value={five} onChange={handleFive}/>
             <input type="text" min={1} required id="six" name="six" className="p-2 border border-black text-black  w-1/7 text-center rounded-md" value={six} onChange={handleSix}/>
-        </Form>
-        {state.error && (
-            <div className="flex w-3/4 items-center justify-center bg-red-300 border-red-700 text-red-950 rounded-md p-2"></div>
+            </div>
+            {state.error && (
+            <div className="flex w-3/4 items-center justify-center bg-red-300 border-red-700 text-red-950 rounded-md p-2 mt-2">{state.error}</div>
         )}
+
         <button type="submit" className="flex items-center justify-center p-2 bg-lime-green rounded-md shadow-md font-bold w-3/4 mt-4 text-xl hover:ring-2 hover:ring-ateneo-blue">確認</button>
+        </Form>
+        
       </div>
 
       

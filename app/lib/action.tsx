@@ -199,13 +199,13 @@ export async function verifyOtpAction(code: string) {
   const cookieStore = await cookies();
 
   // forward cookie JWT ke backend
-  const access = cookieStore.get("access_token")?.value;
+  const token = cookieStore.get("access_token")?.value;
 
-  const res = await fetch(`${backendURL}/otp/verify`, {
+  const res = await fetch(`${backendURL}/auth/otp/verify`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      ...(access ? { cookie: `access_token=${access}` } : {}),
+       Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify({ code }),
     cache: "no-store",
