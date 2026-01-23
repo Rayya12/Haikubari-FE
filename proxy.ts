@@ -9,7 +9,7 @@ export async function proxy(request: NextRequest) {
 
   // belum login
   if (!token) {
-    if (pathname !== "/login" && pathname !== "/register") {
+    if (pathname !== "/login" && pathname !== "/register" && pathname!== "/verify-otp/success") {
       return NextResponse.redirect(new URL("/login", request.url))
     }
     return NextResponse.next()
