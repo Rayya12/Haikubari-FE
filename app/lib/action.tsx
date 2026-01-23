@@ -222,3 +222,44 @@ export async function verifyOtpAction(code: string) {
   };
 }
 
+export async function  handleLogin(prevState:{error?:String} | null,formData:FormData) {
+    const email = formData.get('email')?.toString()
+    const password = formData.get('password')?.toString()
+
+    if (!email) {
+        return {error:"メールアドレスを入れて下さい"}
+    }
+
+    if (!password) {
+        return {error:"パスワードを入れて下さい"}
+    }
+
+    const body = new URLSearchParams();
+    body.set("username",email)
+    body.set("password",password)
+    const response = await fetch(`${backendURL}/auth/jwt/login`,{
+        method : "POST",
+        headers : {
+            'Content-Type' : 'application/x-www-form-urlencoded'
+        },
+        body:body.toString()
+    })
+
+    if (!response.ok){
+        return {error:"ユーサネーム/パスワードが間違いました"}
+    }
+
+    const data = await response.json()
+
+    const kukis = await cookies()
+    kukis.set("access_token",data.access_token,{
+        httpOnly:true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite:"lax",
+        path:"/"
+    })
+
+    redirect("/verify-otp/success")
+    
+}
+
