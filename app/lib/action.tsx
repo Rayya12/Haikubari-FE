@@ -259,7 +259,7 @@ export async function  handleLogin(prevState:{error?:String} | null,formData:For
         path:"/"
     })
 
-    redirect("/verify-otp/success")
+    redirect("/dashboard")
     
 }
 
