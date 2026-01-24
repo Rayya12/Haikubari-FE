@@ -13,8 +13,8 @@
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-whiteku: var(--background);
+  --color-blackku: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   --color-ateneo-blue : var(--ateneo-blue);
