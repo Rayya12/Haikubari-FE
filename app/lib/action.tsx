@@ -262,3 +262,23 @@ export async function  handleLogin(prevState:{error?:String} | null,formData:For
     redirect("/dashboard")   
 }
 
+export async function handleLogout(){
+    const kukis = await cookies()
+    const ctoken = kukis.get("access_token")?.value
+
+    const logout = await fetch(`${backendURL}/auth/jwt/logout`,{
+        method : "POST",
+        headers : {
+            'Content-Type' : 'application/json',
+            'Authorization' : `Bearer ${ctoken}`
+        }
+    })
+
+    
+    kukis.delete("access_token");
+    redirect("/login")
+}
+
+
+
+
