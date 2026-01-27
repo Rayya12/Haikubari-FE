@@ -3,6 +3,12 @@
 import Form from "next/form"
 import { useState } from "react"
 import Link from "next/link"
+import { useActionState } from "react"
+import { handleCreateHaiku } from "../lib/action"
+
+const initialState = {
+    error: undefined as string | undefined
+}
 
 export default function CreateHaiku(){
 
@@ -11,6 +17,7 @@ export default function CreateHaiku(){
     const [line2,setLine2] = useState('')
     const [line3,setLine3] = useState('')
     const [description,setDescription] = useState('')
+    const [state,formAction] = useActionState(handleCreateHaiku,initialState)
 
     const handleChangeTitle = (e:any) => {
         const title = e.target.value
@@ -50,7 +57,14 @@ export default function CreateHaiku(){
     return (<div className="min-h-screen flex flex-col bg-white p-4">
         <div className="mt-20 space-y-4">
         <h1 className="block text-4xl font-bold text-center text-ateneo-blue">新しい俳句を作成</h1>
-        <Form action="/api/haiku" className="flex items-center justify-center">
+        <div className="flex justify-center">
+        {state.error && (
+            <div className="w-full max-w-lg bg-red-300 p-2 rounded-md border border-red-700 text-red-950 mt-2">
+              {state.error as string}
+            </div>
+          )}
+        </div>
+        <Form action={formAction} className="flex items-center justify-center">
             <div className="w-full max-w-lg">
                 <div className="mb-4">
                     <label htmlFor="title" className="block text-sm font-medium text-ateneo-blue">タイトル</label>

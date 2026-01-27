@@ -279,6 +279,62 @@ export async function handleLogout(){
     redirect("/login")
 }
 
+export async function handleCreateHaiku(prevState:{error?:string} | null,formData:FormData) {
+    const title = formData.get("title")?.toString();
+    if (!title || title.trim() === "") {
+        return { error: "タイトルを入れて下さい" };
+    }
 
+    const hashigo = formData.get("line1")?.toString();
+    if (!hashigo || hashigo.trim() === "") {
+        return { error: "第一行を入れて下さい" };
+    }
+    if (hashigo.length > 5){
+        return { error: "第一行は五文字まで入れて下さい" };
+    }
 
+    const nakasichi = formData.get("line2")?.toString();
+    if (!nakasichi || nakasichi.trim() === "") {
+        return { error: "第二行を入れて下さい" };
+    }
+    if (nakasichi.length > 7){
+        return { error: "第二行は七文字まで入れて下さい" };
+    }
 
+    const shimogo = formData.get("line3")?.toString();
+    if (!shimogo || shimogo.trim() === "") {
+        return { error: "第三行を入れて下さい" };
+    }
+    if (shimogo.length > 5){
+        return { error: "第三行は五文字まで入れて下さい" };
+    }
+
+    const user_id = null;
+
+    const description = formData.get("description")?.toString();
+
+    const kukis = await cookies();
+    const ctoken = kukis.get("access_token")?.value;
+
+    const response = await fetch(`${backendURL}/haiku/create`, {
+        method: "POST",
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${ctoken}`
+        },
+        body: JSON.stringify({
+            title,
+            hashigo,
+            nakasichi,
+            shimogo,
+            description,
+            user_id
+        })
+    });
+
+    if (!response.ok) {
+        return { error: "俳句の投稿に失敗しました" };
+    }
+
+    redirect("/dashboard/common/my-haiku");
+}
