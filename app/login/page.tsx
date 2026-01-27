@@ -5,6 +5,7 @@ import Form from 'next/form'
 import Link from "next/link";
 import { useActionState } from "react";
 import { handleLogin } from "../lib/action";
+import { useState } from "react";
 
 
 const initialState = {
@@ -14,6 +15,8 @@ const initialState = {
 export default function LoginPage(){
 
     const [state,formAction] = useActionState(handleLogin,initialState)
+    const [email,setEmail] = useState('')
+    const [password,setPassword] = useState('')
 
    
     return (
@@ -24,12 +27,11 @@ export default function LoginPage(){
                         <div className="flex text-black text-left font-bold w-3/4">
                             <label htmlFor="email" >メール</label>
                         </div>
-                        <input type="email" name="email" id="email" className="w-3/4 border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-ateneo-blue text-black"></input>
+                        <input type="email" name="email" id="email" className="w-3/4 border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-ateneo-blue text-black" value={email} onChange={(e) => setEmail(e.target.value)}></input>
                         <div className="flex text-black text-left w-3/4 font-bold">
                             <label htmlFor="password">パスワード</label>
                         </div>
-                        <input type="password" name="password" id="password" className="w-3/4 border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-ateneo-blue text-black"></input>
-
+                        <input type="password" name="password" id="password" className="w-3/4 border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-ateneo-blue text-black" value={password} onChange={(e) => setPassword(e.target.value)}></input>
                         {state.error && (
             <div className="w-3/4 bg-red-300 p-2 rounded-md border border-red-700 text-red-950 mt-2">
               {state.error as string}

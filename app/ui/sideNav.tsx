@@ -25,7 +25,7 @@ export default function SidebarNav(){
   <nav className="px-2">
     <ul className="space-y-3">
       {items.map((it) => {
-        const active = pathname === it.href
+        const active = pathname === it.href || pathname == "/dashboard/common/my-haiku/create" && it.href == "/dashboard/common/my-haiku"
         const Icon = it.icon
 
         return (
@@ -35,8 +35,8 @@ export default function SidebarNav(){
               className={clsx(
                 "group relative flex w-full items-center gap-3 rounded-md px-4 py-3 transition-colors",
                 active
-                  ? " bg-ateneo-blue text-white shadow-sm"
-                  : "text-ateneo-blue hover:bg-slate-100"
+                  ? " bg-lime-green text-white shadow-sm"
+                  : " text-lime-green hover:bg-slate-100"
               )}
             >
               <Icon className="h-5 w-5" strokeWidth={2.2} />
