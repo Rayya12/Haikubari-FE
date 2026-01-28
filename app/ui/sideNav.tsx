@@ -18,7 +18,7 @@ export default function SidebarNav(){
     const pathname = usePathname();
 
     return(
-<aside className="bg-white h-screen w-[280px] border-r border-slate-200 shadow-md p-4 flex flex-col">
+<aside className="bg-white h-screen w-[280px] border-r border-slate-200 shadow-md p-4 flex flex-col sticky top-0">
   {/* Logo */}
   <div className="pt-8 pb-6">
     <Image src="/blacklogo.png" alt="俳句配りのロゴ" width={300} height={300} />

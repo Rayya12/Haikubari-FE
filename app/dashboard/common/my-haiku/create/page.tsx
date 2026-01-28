@@ -1,7 +1,9 @@
 import CreateHaiku from "@/app/page/CreateHaiku";
 
 export default function createHaiku(){
-    return <div>
+    return(
+    <div>
         <CreateHaiku/>
     </div>
+    )
 }

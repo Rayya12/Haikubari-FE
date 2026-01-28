@@ -1,9 +1,8 @@
 'use server'
 
-import { error } from "console"
 import { redirect } from "next/navigation"
 import { cookies } from "next/headers"
-import Link from "next/link"
+import {Haiku, MyHaikusResponse} from "./type"
 
 
 const backendURL = process.env.BACKEND_URL
@@ -309,14 +308,13 @@ export async function handleCreateHaiku(prevState:{error?:string} | null,formDat
         return { error: "第三行は五文字まで入れて下さい" };
     }
 
-    const user_id = null;
 
     const description = formData.get("description")?.toString();
 
     const kukis = await cookies();
     const ctoken = kukis.get("access_token")?.value;
 
-    const response = await fetch(`${backendURL}/haiku/create`, {
+    const response = await fetch(`${backendURL}/haikus/create`, {
         method: "POST",
         headers: {
             'Content-Type': 'application/json',
@@ -327,8 +325,7 @@ export async function handleCreateHaiku(prevState:{error?:string} | null,formDat
             hashigo,
             nakasichi,
             shimogo,
-            description,
-            user_id
+            description
         })
     });
 
@@ -337,4 +334,48 @@ export async function handleCreateHaiku(prevState:{error?:string} | null,formDat
     }
 
     redirect("/dashboard/common/my-haiku");
+}
+
+type GetMyHaikusParams = {
+  page?: number;
+  page_size?: number;
+  q?: string;
+  sort?: "created_at" | "likes";
+  order?: "asc" | "desc";
+};
+
+export async function getMyHaikus(params: GetMyHaikusParams = {}): Promise<MyHaikusResponse> {
+  const kukis = await cookies();
+  const ctoken = kukis.get("access_token")?.value;
+
+  if (!ctoken) {
+    throw new Error("No access token (not logged in?)");
+  }
+
+  const search = new URLSearchParams();
+
+  if (params.page) search.set("page", String(params.page));
+  if (params.page_size) search.set("page_size", String(params.page_size));
+  if (params.q) search.set("q", params.q);
+  if (params.sort) search.set("sort", params.sort);
+  if (params.order) search.set("order", params.order);
+
+
+  const url = `${backendURL}/haikus/my-haikus?${search.toString()}`;
+
+  const response = await fetch(url, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${ctoken}`,
+    },
+    cache: "no-store",
+  });
+
+  if (!response.ok) {
+    const errText = await response.text().catch(() => "");
+    throw new Error(`Failed to fetch haikus (${response.status}): ${errText}`);
+  }
+
+  const data = (await response.json()) as MyHaikusResponse;
+  return data;
 }
