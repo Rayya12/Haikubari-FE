@@ -17,7 +17,7 @@ export default function MyHaikuPage() {
   const sp = useSearchParams();
 
   const page = Number(sp.get("page") ?? "1");
-  const pageSize = Number(sp.get("page_size") ?? "6");
+  const pageSize = Number(sp.get("page_size") ?? "8");
   const q = sp.get("q") ?? "";
   const sort = (sp.get("sort") ?? "created_at") as "created_at" | "likes";
   const order = (sp.get("order") ?? "desc") as "asc" | "desc";
@@ -86,7 +86,7 @@ export default function MyHaikuPage() {
       {/* Header */}
       <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between lg:mb-15">
         <div>
-          <h1 className="text-xl font-bold text-ateneo-blue">自分の俳句</h1>
+          <h1 className="text-2xl font-bold text-ateneo-blue">自分の俳句</h1>
           <p className="text-sm text-teal-Deer">
             {data ? `${data.total} 件` : "—"}
           </p>
