@@ -379,3 +379,43 @@ export async function getMyHaikus(params: GetMyHaikusParams = {}): Promise<MyHai
   const data = (await response.json()) as MyHaikusResponse;
   return data;
 }
+
+export async function getAllHaikus(params:GetMyHaikusParams = {}): Promise<MyHaikusResponse> {
+    const kukis = await cookies();
+    const ctoken = kukis.get("access_token")?.value;
+
+    if (!ctoken){
+        throw new Error("no access token (not logged in?)")
+    }
+
+    const search = new URLSearchParams();
+
+    if (params.page) search.set("page",String(params.page))
+    if (params.page_size) search.set("page_size",String(params.page_size))
+    if (params.q) search.set("q",params.q)
+    if (params.sort) search.set("sort",params.sort)
+    if (params.order) search.set("order",params.order)
+    
+    const url = `${backendURL}/haikus?${search.toString()}`;
+
+    const response = await fetch(url,{
+        method:"GET",
+        headers:{
+            Authorization: `Bearer ${ctoken}`,
+        },
+        cache:"no-store"
+    })
+
+    if (!response.ok){
+        const errtext = await response.text().catch(()=>"")
+        throw new Error(`Failed to fetch haikus (${response.status}): ${errtext}`)
+    }
+
+    const data = (await response.json()) as MyHaikusResponse;
+
+    return data;
+
+
+        
+    
+}
