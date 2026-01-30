@@ -164,7 +164,7 @@ export default function AllHaikuList() {
 
       {
         !loading && data && data.items.length !== 0 && (
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
             {data.items.map((haiku)=>{
               return <HaikuCard key={haiku.id} title={haiku.title} line1={haiku.hashigo} line2={haiku.nakasichi} line3={haiku.shimogo} id={haiku.id} />;
             })}
@@ -175,7 +175,7 @@ export default function AllHaikuList() {
       {/* Pagination */}
       {totalPages > 1 && (
         <div className="flex items-center justify-center mt-4 space-x-2">
-          <button className="rounded-md bg-ateneo-blue px-3 py-1 text-white hover:bg-black disabled:bg-gray-400"
+          <button className={clsx(`rounded-md px-3 py-1 text-white hover:bg-black disabled:bg-gray-400 `,page === 1? 'bg-ateneo-blue':"bg-lime-green")}
           onClick={() => setParams({page: page - 1})}
           disabled={safePage <= 1}
           >前へ</button>
@@ -205,7 +205,7 @@ export default function AllHaikuList() {
           pageButtons[pageButtons.length-1] !== totalPages && (
             <>
             <span className="px-2 text-black">...</span>
-            <button className="rounded-md bg-ateneo-blue px-3 py-1 text-white hover:bg-black"
+            <button className={clsx("rounded-md bg-ateneo-blue px-3 py-1 text-white hover:bg-black ",page===totalPages? "bg-ateneo-blue":"bg-lime-green")}
             onClick={()=>{setParams({page:totalPages})}}>
               {totalPages}
             </button>
