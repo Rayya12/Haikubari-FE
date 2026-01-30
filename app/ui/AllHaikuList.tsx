@@ -5,7 +5,8 @@ import HaikuCard from "./HaikuCard";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { MyHaikusResponse } from "../lib/type";
-import { getAllHaikus } from "../lib/action";
+import { getAllHaikus,getMyHaikus } from "../lib/action";
+import clsx from "clsx";
 
 
 function clamp(n: number, min: number, max: number) {
@@ -35,7 +36,7 @@ export default function AllHaikuList() {
             setLoading(true);
             setErr(null);
             try{
-                const json = await getAllHaikus({page:page,page_size:pageSize,q:q || undefined,sort:sort,order:order});
+                const json = await getMyHaikus({page:page,page_size:pageSize,q:q || undefined,sort:sort,order:order});
                 if (!cancelled) setData(json);
             }catch(e:any){
                 if (!cancelled) setErr(e?.message ?? "failed to load");
@@ -77,7 +78,7 @@ export default function AllHaikuList() {
     }, [safePage,totalPages]);
 
     return(
-        <div className="p-6 space-y-4">
+      <div className="p-6 space-y-4">
       {/* Header */}
       <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between lg:mb-15">
         <div>
@@ -140,13 +141,95 @@ export default function AllHaikuList() {
       </div>
 
       
-
       {/* States */}
       {err && (
         <div className="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700">
           {err}
         </div>
       )}
+
+      {
+        loading && (<div className="rounded-md - border border-gray-500 bg-gray-400 text-sm text-black">読み込み中...</div>)
+      }
+
+      {/* Haiku List */}
+
+      {
+        !loading && data && data.items.length === 0 && (
+          <div className="flex px-3 py-2 bg-slate-400 rounded-md">俳句が見つかりません</div>
+        )  
+      }
+
+
+
+      {
+        !loading && data && data.items.length !== 0 && (
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {data.items.map((haiku)=>{
+              return <HaikuCard key={haiku.id} title={haiku.title} line1={haiku.hashigo} line2={haiku.nakasichi} line3={haiku.shimogo} id={haiku.id} />;
+            })}
+          </div>
+        )
+      }
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-center mt-4 space-x-2">
+          <button className="rounded-md bg-ateneo-blue px-3 py-1 text-white hover:bg-black disabled:bg-gray-400"
+          onClick={() => setParams({page: page - 1})}
+          disabled={safePage <= 1}
+          >前へ</button>
+
+
+        {pageButtons[0]!=1&&(
+          <>
+          <button className="rounded-md bg-ateneo-blue px-3 py-1 text-white hover:bg-black disabled:bg-gray-400"
+          onClick={()=>setParams({page:1})}>
+            1
+          </button>
+          <span className="px-1 text-black">...</span>
+          </>
+        )}
+        {
+          pageButtons.map((p)=>{
+            return(
+              <button key={p} className={clsx(`rounded-md px-3 py-1 text-white `,p===safePage? "bg-ateneo-blue" : "bg-lime-green")}
+              onClick={()=>setParams({page:p})}>
+                {p}
+              </button>
+            )
+          })
+        }
+
+        {
+          pageButtons[pageButtons.length-1] !== totalPages && (
+            <>
+            <span className="px-2 text-black">...</span>
+            <button className="rounded-md bg-ateneo-blue px-3 py-1 text-white hover:bg-black"
+            onClick={()=>{setParams({page:totalPages})}}>
+              {totalPages}
+            </button>
+            </>
+          )
+        }
+
+        <button className="rounded-md bg-ateneo-blue px-3 py-1 text-white hover:bg-black disabled:bg-gray-400"
+        disabled={safePage>=totalPages}
+        onClick={()=>{setParams({page:page+1})}}
+        >
+          次へ
+        </button>
+
+
+
+
+        </div>
+
+
+
+      )
+      }
+
 
       </div>)
     
