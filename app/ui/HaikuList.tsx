@@ -7,6 +7,7 @@ import { getMyHaikus } from "../lib/action";
 import { json } from "stream/consumers";
 import HaikuCard from "@/app/ui/HaikuCard";
 import Link from "next/link";
+import { Pavanam } from "next/font/google";
 
 function clamp(n: number, min: number, max: number) {
   return Math.max(min, Math.min(max, n));
@@ -103,7 +104,7 @@ export default function MyHaikuPage() {
             />
             <button
               onClick={() => setParams({ q: searchInput, page: 1 })}
-              className="rounded-md border border-ateneo-blue bg-white px-3 py-2 text-sm hover:bg-slate-300 text-ateneo-blue"
+              className="rounded-md border border-ateneo-blue bg-ateneo-blue px-3 py-2 text-sm hover:bg-black text-white"
             >
               検索
             </button>
@@ -140,7 +141,7 @@ export default function MyHaikuPage() {
               ))}
             </select>
 
-            <Link href={"/dashboard/common/my-haiku/create"} className="rounded-md bg-lime-green px-3 py-2 text-sm text-white font-bold">
+            <Link href={"/dashboard/common/haiku/mine/create"} className="rounded-md bg-lime-green px-3 py-2 text-sm text-white font-bold">
                 俳句を作成
             </Link>
           </div>
@@ -187,20 +188,20 @@ export default function MyHaikuPage() {
           <button
             disabled={safePage <= 1}
             onClick={() => setParams({ page: safePage - 1 })}
-            className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm disabled:opacity-40"
+            className="rounded-md border bg-ateneo-blue px-3 py-2 text-sm disabled:opacity-40"
           >
-            Prev
+            前へ
           </button>
 
           {pageButtons[0] !== 1 && (
             <>
               <button
                 onClick={() => setParams({ page: 1 })}
-                className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm"
+                className= {`rounded-md border px-3 py-2 text-sm ${page === 1 ? "bg-ateneo-blue":"bg-lime-green"}`}
               >
                 1
               </button>
-              <span className="px-1 text-slate-400">…</span>
+              <span className="px-1 text-black">…</span>
             </>
           )}
 
@@ -210,8 +211,8 @@ export default function MyHaikuPage() {
               onClick={() => setParams({ page: p })}
               className={`rounded-md border px-3 py-2 text-sm ${
                 p === safePage
-                  ? "border-slate-900 bg-slate-900 text-white"
-                  : "border-slate-300 bg-white"
+                  ? "bg-ateneo-blue text-white"
+                  : "bg-lime-green text-white"
               }`}
             >
               {p}
@@ -220,10 +221,10 @@ export default function MyHaikuPage() {
 
           {pageButtons[pageButtons.length - 1] !== totalPages && (
             <>
-              <span className="px-1 text-slate-400">…</span>
+              <span className="px-1 text-black">…</span>
               <button
                 onClick={() => setParams({ page: totalPages })}
-                className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm"
+                className={`rounded-md border px-3 py-2 text-sm ${page === totalPages ? "bg-ateneo-blue":"bg-lime-green"}`}
               >
                 {totalPages}
               </button>
@@ -233,7 +234,7 @@ export default function MyHaikuPage() {
           <button
             disabled={safePage >= totalPages}
             onClick={() => setParams({ page: safePage + 1 })}
-            className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm disabled:opacity-40"
+            className="rounded-md border bg-ateneo-blue px-3 py-2 text-sm text-white disabled:opacity-40"
           >
             Next
           </button>

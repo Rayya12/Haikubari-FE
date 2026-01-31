@@ -8,8 +8,8 @@ import { handleLogout } from "@/app/lib/action";
 
 const items = [
     {href:"/dashboard/common",label:"ホームページ",icon:Home},
-    {href:"/dashboard/common/my-haiku",label:"自分の俳句",icon:Feather},
-    {href:"/dashboard/common/all-haiku",label:"全部の俳句",icon:AlignLeft},
+    {href:"/dashboard/common/haiku/mine",label:"自分の俳句",icon:Feather},
+    {href:"/dashboard/common/haiku/all",label:"全部の俳句",icon:AlignLeft},
     {href:"/dashboard/common/learn",label:"俳句を学ぶ",icon:GraduationCap},
     {href:"/dashboard/common/settings",label:"プロファイル設定",icon:Settings},
 ]
@@ -29,9 +29,7 @@ export default function SidebarNav(){
     <ul className="space-y-3">
       {items.map((it) => {
         const active =
-          pathname === it.href ||
-          (pathname === "/dashboard/common/my-haiku/create" &&
-            it.href === "/dashboard/common/my-haiku")
+          pathname === it.href
 
         const Icon = it.icon
 

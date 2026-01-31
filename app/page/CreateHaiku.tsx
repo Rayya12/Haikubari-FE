@@ -94,7 +94,7 @@ export default function CreateHaiku(){
                         onChange={handleChangeDescription}/>
                 </div>
                 <div className="flex w-full justify-end space-x-2">
-                    <Link href={"/dashboard/common/my-haiku"} className="w-1/4 bg-ateneo-blue hover:ring-2 ring-lime-green text-white font-bold py-2 px-4 rounded text-center">戻ります</Link>
+                    <Link href={"/dashboard/common/haiku/mine"} className="w-1/4 bg-ateneo-blue hover:ring-2 ring-lime-green text-white font-bold py-2 px-4 rounded text-center">戻ります</Link>
                     <button type="submit" className="w-1/4 bg-lime-green hover:ring-2 ring-ateneo-blue text-white font-bold py-2 px-4 rounded text-center">俳句を投稿</button>
                 </div>
                 

@@ -36,7 +36,8 @@ export default function AllHaikuList() {
             setLoading(true);
             setErr(null);
             try{
-                const json = await getMyHaikus({page:page,page_size:pageSize,q:q || undefined,sort:sort,order:order});
+                const json = await getAllHaikus({page:page,page_size:pageSize,q:q || undefined,sort:sort,order:order});
+                console.log(data?.total)
                 if (!cancelled) setData(json);
             }catch(e:any){
                 if (!cancelled) setErr(e?.message ?? "failed to load");
@@ -64,7 +65,7 @@ export default function AllHaikuList() {
     }
 
     const totalPages = data ? data.total_pages:0;
-    const safePage = clamp(page,1,totalPages);
+    const safePage = totalPages? clamp(page,1,totalPages):page;
 
     const pageButtons = useMemo(()=>{
         const tp = totalPages;
@@ -99,7 +100,7 @@ export default function AllHaikuList() {
             />
             <button
               onClick={() => setParams({ q: searchInput, page: 1 })}
-              className="rounded-md border border-ateneo-blue bg-white px-3 py-2 text-sm hover:bg-slate-300 text-ateneo-blue"
+              className="rounded-md border border-ateneo-blue bg-ateneo-blue px-3 py-2 text-sm hover:bg-black text-white"
             >
               検索
             </button>
@@ -141,6 +142,7 @@ export default function AllHaikuList() {
       </div>
 
       
+
       {/* States */}
       {err && (
         <div className="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700">
@@ -148,17 +150,17 @@ export default function AllHaikuList() {
         </div>
       )}
 
-      {
-        loading && (<div className="rounded-md - border border-gray-500 bg-gray-400 text-sm text-black">読み込み中...</div>)
-      }
+      {loading && (
+        <div className="text-sm text-slate-500">Loading...</div>
+      )}
 
       {/* Haiku List */}
-
-      {
-        !loading && data && data.items.length === 0 && (
-          <div className="flex px-3 py-2 bg-slate-400 rounded-md">俳句が見つかりません</div>
-        )  
-      }
+      {/* Empty */}
+      {!loading && data && data.items.length === 0 && (
+        <div className="rounded-md border border-slate-200 bg-white p-6 text-center text-sm text-slate-500">
+          まだ俳句がありません
+        </div>
+      )}
 
 
 
