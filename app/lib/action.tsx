@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation"
 import { cookies } from "next/headers"
 import {Haiku, MyHaikusResponse} from "./type"
+import { AsyncCallbackSet } from "next/dist/server/lib/async-callback-set"
 
 
 const backendURL = process.env.BACKEND_URL
@@ -415,7 +416,32 @@ export async function getAllHaikus(params:GetMyHaikusParams = {}): Promise<MyHai
 
     return data;
 
+   
+}
 
-        
+export async function getHaikuById(id:string) {
+    const kukis = await cookies()
+    const ctoken = kukis.get("access_token")?.value
+
+    if (!ctoken){
+        throw new Error("no access token (not logged in?)")
+    }
+    
+    const response = await fetch(`${backendURL}/haikus/${id}`,{
+        method :"GET",
+        headers : {
+            Authorization : `Bearer ${ctoken}`
+        },
+        cache: "no-store"
+    })
+
+    if (!response.ok){
+        const errtext = await response.text().catch(()=>"")
+        throw new Error(`Failed to fetch haikus (${response.status}): ${errtext}`)
+    }
+
+    const data = await response.json();
+    return data;
+
     
 }
