@@ -151,7 +151,7 @@ export default function AllHaikuList() {
       )}
 
       {loading && (
-        <div className="text-sm text-slate-500">Loading...</div>
+        <div className="text-sm text-slate-500">ロード...</div>
       )}
 
       {/* Haiku List */}
