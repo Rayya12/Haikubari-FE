@@ -69,10 +69,14 @@ export default function ShowHaiku(props : {id:string}){
                                 </div>
                             </div>
                         }
-
-                        
-                    
                 </div>
+
+                <button className="flex w-full justify-end mt-8">
+                    <button className="flex p-4 bg-red-300 text-black font-bold rounded-md hover:shadow-md">
+                        ❤️いいね
+                    </button>
+                    
+                </button>
 
             </div>
             }
