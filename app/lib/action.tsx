@@ -4,6 +4,7 @@ import { redirect } from "next/navigation"
 import { cookies } from "next/headers"
 import {Haiku, MyHaikusResponse} from "./type"
 import { AsyncCallbackSet } from "next/dist/server/lib/async-callback-set"
+import { resolve } from "path"
 
 
 const backendURL = process.env.BACKEND_URL
@@ -444,4 +445,42 @@ export async function getHaikuById(id:string) {
     return data;
 
     
+}
+
+export async function likes(haiku_id:string) {
+    const kukis = await cookies();
+    const cToken = kukis.get("access_token")?.value;
+
+    const response = await fetch(`${backendURL}/haikus/${haiku_id}/likes`,{
+        method : "PATCH",
+        headers : {
+            Authorization: `Bearer ${cToken}`
+        }
+    })
+
+    if (!response.ok){
+        const errText = await response.text().catch(()=>"")
+        throw new Error(`Failed to likes haikus (${response.status}):${errText}`)
+    }
+
+    return "ok"
+}
+
+export async function unlikes(haiku_id:string) {
+    const kukis = await cookies();
+    const cToken = kukis.get("access_token")?.value;
+
+    const response = await fetch(`${backendURL}/haikus/${haiku_id}/unlikes`,{
+        method : "PATCH",
+        headers : {
+            Authorization: `Bearer ${cToken}`
+        }
+    })
+
+    if (!response.ok){
+        const errText = await response.text().catch(()=>"")
+        throw new Error(`Failed to likes haikus (${response.status}):${errText}`)
+    }
+
+    return "ok"
 }
