@@ -1,7 +1,9 @@
+"use client"
 import { use, useEffect, useState } from "react";
 import { getHaikuById } from "../lib/action"
 import { Haiku } from "../lib/type";
 import { ThumbsUp } from "lucide-react";
+import { likes, unlikes,getIsLikes } from "../lib/action";
 
 
 export default function ShowHaiku(props : {id:string}){
@@ -9,6 +11,8 @@ export default function ShowHaiku(props : {id:string}){
     const [err,setErr] = useState<string>("")
     const [loading,setLoading] = useState(false)
     const [more,setdescMore] = useState(false)
+    const [isLikes,setIslike] = useState<Boolean>(false)
+
     useEffect(()=>{
         async function run() {
             setLoading(true)
@@ -25,6 +29,38 @@ export default function ShowHaiku(props : {id:string}){
         
     },[props.id])
 
+    useEffect(()=>{
+        async function  run() {
+            if (haiku != null){
+                try{
+                    const data = await getIsLikes(haiku.id);
+                    setIslike(data)
+                }catch(e:any){
+                    setErr(e?.message ?? "failed to getLikes")
+                }
+            }     
+        }
+        run();  
+    },[haiku?.id])
+
+    const handleLike = async () => {
+        try{
+            const response = await likes(props?.id);
+        }catch(error:any){
+            setErr(error?.message ?? "failed to likes")
+        }
+        
+    }
+
+    const handleUnlike = async () => {
+        try{
+            const response = await unlikes(props?.id);
+        }catch(error:any){
+            setErr(error?.message ?? "failed to likes")
+        }
+    }
+
+    
     return(
         <div className="flex flex-col pt-8 w-full items-center px-4">
             {loading && <div className="text-black text-2xl">
@@ -71,12 +107,18 @@ export default function ShowHaiku(props : {id:string}){
                         }
                 </div>
 
-                <button className="flex w-full justify-end mt-8">
-                    <button className="flex p-4 bg-red-300 text-black font-bold rounded-md hover:shadow-md">
+                <div className="flex w-full justify-end mt-8">
+                    <button className="flex p-4 bg-white text-black font-bold rounded-md hover:shadow-md border-slate-600" onClick={handleLike}>
+                        🤍いいね, {String (isLikes)}
+                    </button>
+
+                    <button className="flex p-4 bg-red-300 text-black font-bold rounded-md hover:shadow-md border-red-600" onClick={handleUnlike}>
                         ❤️いいね
                     </button>
+
+
                     
-                </button>
+                </div>
 
             </div>
             }
