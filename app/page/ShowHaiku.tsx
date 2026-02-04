@@ -12,15 +12,16 @@ export default function ShowHaiku(props : {id:string}){
     const [loading,setLoading] = useState(false)
     const [more,setdescMore] = useState(false)
     const [isLikes,setIslike] = useState<Boolean>(false)
+    const [numLikes,setNumLikes] = useState<Number>(0)
 
     useEffect(()=>{
         async function run() {
             setLoading(true)
             try{
-                const data = await getHaikuById(props.id);
-                const like = await getIsLikes(props.id);
+                const [data,like] = await Promise.all([getHaikuById(props.id), getIsLikes(props.id)])    
                 setHaiku(data)
                 setIslike(like)
+                setNumLikes(data.likes)
             }catch(e:any){
                 setErr(e?.message ?? "failed to load")
             }finally{
@@ -33,8 +34,10 @@ export default function ShowHaiku(props : {id:string}){
 
     const handleLike = async () => {
         try{
-            const response = await likes(props?.id);
+            const [response,data] = await Promise.all([likes(props?.id),getHaikuById(props?.id)])
             setIslike(true)
+            setNumLikes(data?.likes)
+
         }catch(error:any){
             setErr(error?.message ?? "failed to likes")
         }
@@ -43,8 +46,9 @@ export default function ShowHaiku(props : {id:string}){
 
     const handleUnlike = async () => {
         try{
-            const response = await unlikes(props?.id);
+            const [response,data] = await Promise.all([unlikes(props?.id),getHaikuById(props?.id)])
             setIslike(false);
+            setNumLikes(data?.likes);
         }catch(error:any){
             setErr(error?.message ?? "failed to likes")
         }
@@ -66,7 +70,7 @@ export default function ShowHaiku(props : {id:string}){
                     <p className="font-bold text-2xl text-black mt-4 justify-center mb-4">{haiku?.shimogo}</p>
                 </div>
 
-                <div className="flex flex-col border-2 border-slate-400 shadow-md p-4 mt-8 w-full">
+                <div className="flex flex-col border-2 border-slate-400 shadow-md p-4 mt-8 w-full rounded-md">
                     <h2 className="text-xl text-black font-bold mb-2">解釈</h2>
                         {haiku?.description != null && haiku.description?.length < 30 && <p className="text-black">
                             {haiku.description}
@@ -99,6 +103,10 @@ export default function ShowHaiku(props : {id:string}){
 
                 <div className="flex w-full justify-end mt-8">
 
+                    <div className="flex p-4 text-black">
+                        いいね回数：{String(numLikes)}
+                    </div>
+
                     {!isLikes && 
                     <button className="flex p-4 bg-white text-black font-bold rounded-md hover:shadow-md border border-slate-600 transition-colors" onClick={handleLike}>
                         🤍いいね
@@ -111,8 +119,16 @@ export default function ShowHaiku(props : {id:string}){
                         ❤️ いいね
                     </button>
                     }
+
+
                     
                     
+                </div>
+
+                <div className="flex w-full p-4 mt-8 border-2 border-slate-400 shadow-md rounded-md">
+                    <h2 className="text-2xl text-black text-start font-bold ">レビュー</h2>
+
+
                 </div>
 
             </div>
