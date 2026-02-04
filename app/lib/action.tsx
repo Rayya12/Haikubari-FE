@@ -471,7 +471,7 @@ export async function unlikes(haiku_id:string) {
     const cToken = kukis.get("access_token")?.value;
 
     const response = await fetch(`${backendURL}/haikus/${haiku_id}/unlikes`,{
-        method : "PATCH",
+        method : "DELETE",
         headers : {
             Authorization: `Bearer ${cToken}`
         }
@@ -498,8 +498,7 @@ export async function getIsLikes(id:string) {
     })
 
     if (!response.ok){
-        const errText = await response.text().catch(()=>"")
-        throw new Error(`Failed to see likes (${response.status}):${errText}`)
+        return false as Boolean;
     }
 
     return true as Boolean;

@@ -18,7 +18,9 @@ export default function ShowHaiku(props : {id:string}){
             setLoading(true)
             try{
                 const data = await getHaikuById(props.id);
+                const like = await getIsLikes(props.id);
                 setHaiku(data)
+                setIslike(like)
             }catch(e:any){
                 setErr(e?.message ?? "failed to load")
             }finally{
@@ -29,23 +31,10 @@ export default function ShowHaiku(props : {id:string}){
         
     },[props.id])
 
-    useEffect(()=>{
-        async function  run() {
-            if (haiku != null){
-                try{
-                    const data = await getIsLikes(haiku.id);
-                    setIslike(data)
-                }catch(e:any){
-                    setErr(e?.message ?? "failed to getLikes")
-                }
-            }     
-        }
-        run();  
-    },[haiku?.id])
-
     const handleLike = async () => {
         try{
             const response = await likes(props?.id);
+            setIslike(true)
         }catch(error:any){
             setErr(error?.message ?? "failed to likes")
         }
@@ -55,6 +44,7 @@ export default function ShowHaiku(props : {id:string}){
     const handleUnlike = async () => {
         try{
             const response = await unlikes(props?.id);
+            setIslike(false);
         }catch(error:any){
             setErr(error?.message ?? "failed to likes")
         }
@@ -92,7 +82,7 @@ export default function ShowHaiku(props : {id:string}){
 
                         {haiku?.description != null && haiku.description?.length > 30 && !more &&
                             <div className="flex justify-center">
-                                <div className="flex rounded-md px-4 py-2 mt-4 bg-black hover:bg-slate-400 border border-black  text-black" onClick={()=>{setdescMore(true)}}>
+                                <div className="flex rounded-md px-4 py-2 mt-4 hover:bg-slate-400 border border-black  text-black" onClick={()=>{setdescMore(true)}}>
                                     もっと見る
                                 </div>
                             </div>
@@ -100,7 +90,7 @@ export default function ShowHaiku(props : {id:string}){
 
                         {haiku?.description != null && haiku.description?.length > 30 && more &&
                             <div className="flex justify-center">
-                                <div className="flex rounded-md px-4 py-2 mt-4 bg-black hover:bg-slate-400 border border-black  text-black" onClick={()=>{setdescMore(false)}}>
+                                <div className="flex rounded-md px-4 py-2 mt-4 hover:bg-slate-400 border border-black  text-black" onClick={()=>{setdescMore(false)}}>
                                     隠す
                                 </div>
                             </div>
@@ -108,15 +98,20 @@ export default function ShowHaiku(props : {id:string}){
                 </div>
 
                 <div className="flex w-full justify-end mt-8">
-                    <button className="flex p-4 bg-white text-black font-bold rounded-md hover:shadow-md border-slate-600" onClick={handleLike}>
-                        🤍いいね, {String (isLikes)}
+
+                    {!isLikes && 
+                    <button className="flex p-4 bg-white text-black font-bold rounded-md hover:shadow-md border border-slate-600 transition-colors" onClick={handleLike}>
+                        🤍いいね
                     </button>
+                    }
 
-                    <button className="flex p-4 bg-red-300 text-black font-bold rounded-md hover:shadow-md border-red-600" onClick={handleUnlike}>
-                        ❤️いいね
+                    
+                    {isLikes && 
+                    <button className="flex p-4 text-black font-bold rounded-md hover:shadow-md bg-red-300 border border-red-600 transition-colors" onClick={handleUnlike}>
+                        ❤️ いいね
                     </button>
-
-
+                    }
+                    
                     
                 </div>
 
