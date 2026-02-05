@@ -1,9 +1,9 @@
 "use client"
 import { use, useEffect, useState } from "react";
 import { getHaikuById } from "../lib/action"
-import { Haiku } from "../lib/type";
+import { Haiku,reviewResponse ,Review} from "../lib/type";
 import { ThumbsUp } from "lucide-react";
-import { likes, unlikes,getIsLikes } from "../lib/action";
+import { likes, unlikes,getIsLikes,getReview} from "../lib/action";
 
 
 export default function ShowHaiku(props : {id:string}){
@@ -13,14 +13,16 @@ export default function ShowHaiku(props : {id:string}){
     const [more,setdescMore] = useState(false)
     const [isLikes,setIslike] = useState<Boolean>(false)
     const [numLikes,setNumLikes] = useState<Number>(0)
+    const [reviewku, setReview] = useState<reviewResponse | null>(null)
 
     useEffect(()=>{
         async function run() {
             setLoading(true)
             try{
-                const [data,like] = await Promise.all([getHaikuById(props.id), getIsLikes(props.id)])    
+                const [data,like,reviewres] = await Promise.all([getHaikuById(props.id), getIsLikes(props.id),getReview(props.id)])    
                 setHaiku(data)
                 setIslike(like)
+                setReview(reviewres)
                 setNumLikes(data.likes)
             }catch(e:any){
                 setErr(e?.message ?? "failed to load")
@@ -125,8 +127,20 @@ export default function ShowHaiku(props : {id:string}){
                     
                 </div>
 
-                <div className="flex w-full p-4 mt-8 border-2 border-slate-400 shadow-md rounded-md">
-                    <h2 className="text-2xl text-black text-start font-bold ">レビュー</h2>
+                <div className="flex flex-col w-full p-4 mt-8 border-2 border-slate-400 shadow-md rounded-md">
+                    <div className="flex font-bold text-white justify-between">
+                        <h2 className="text-2xl text-black text-start font-bold ">レビュー</h2>
+                        <button className="bg-lime-green px-2 py-3 rounded-md">レビューを作る</button>
+                    </div>
+                    
+                    {reviewku?.reviews.map((review)=>{
+                        return (
+                        <div className="text-black px-1 py-2 border-1 border-slate-500 rounded-md mt-4" key={review.id}>
+                            <p className="text-xs font-bold mb-1">レビューユーザーの名前</p>
+                            <p>{review.content}</p>
+                        </div>)
+                    })}
+                    
 
 
                 </div>

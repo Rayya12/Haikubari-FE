@@ -20,3 +20,17 @@ export type MyHaikusResponse = {
   total_pages: number;
   items: Haiku[];
 };
+
+
+export type Review = {
+  id: string;
+  user_id : string;
+  haiku_id : string;
+  create_at : string;
+  likes : number;
+  content :string;
+};
+
+export type reviewResponse = {
+  reviews : Review[]
+}

@@ -2,7 +2,7 @@
 
 import { redirect } from "next/navigation"
 import { cookies } from "next/headers"
-import {Haiku, MyHaikusResponse} from "./type"
+import {Haiku, MyHaikusResponse,Review,reviewResponse} from "./type"
 import { AsyncCallbackSet } from "next/dist/server/lib/async-callback-set"
 import { resolve } from "path"
 
@@ -502,4 +502,25 @@ export async function getIsLikes(id:string) {
     }
 
     return true as Boolean;
+}
+
+export async function  getReview(id:string) {
+    const kukis = await cookies();
+    const cToken = kukis.get("access_token")?.value;
+
+    const response = await fetch(`${backendURL}/reviews/${id}`,{
+        method:"GET",
+        headers : {
+            Authorization :`Bearer ${cToken}`
+        }
+    })
+
+    if (!response.ok){
+        const errtext = await response.text().catch(()=>"")
+        throw Error(`Error with status code (${response.status}):${errtext}`)
+    }
+
+    const data = (await response.json()) as reviewResponse;
+
+    return data;
 }
