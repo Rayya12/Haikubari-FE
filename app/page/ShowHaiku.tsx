@@ -1,10 +1,12 @@
 "use client"
-import { use, useEffect, useState } from "react";
+import { use, useActionState, useEffect, useState } from "react";
 import { getHaikuById } from "../lib/action"
 import { Haiku,reviewResponse ,Review} from "../lib/type";
 import { ThumbsUp } from "lucide-react";
-import { likes, unlikes,getIsLikes,getReview} from "../lib/action";
+import { likes, unlikes,getIsLikes,getReview,createReview} from "../lib/action";
+import Form from "next/form";
 
+const initialState = {error :undefined as string | undefined}
 
 export default function ShowHaiku(props : {id:string}){
     const [haiku,setHaiku] = useState<Haiku|null>(null)
@@ -14,6 +16,8 @@ export default function ShowHaiku(props : {id:string}){
     const [isLikes,setIslike] = useState<Boolean>(false)
     const [numLikes,setNumLikes] = useState<Number>(0)
     const [reviewku, setReview] = useState<reviewResponse | null>(null)
+    const [iscreate,setIsCreate] = useState<Boolean>(false)
+    const [state,formAction] = useActionState<>(createReview as any,initialState)
 
     useEffect(()=>{
         async function run() {
@@ -130,8 +134,23 @@ export default function ShowHaiku(props : {id:string}){
                 <div className="flex flex-col w-full p-4 mt-8 border-2 border-slate-400 shadow-md rounded-md">
                     <div className="flex font-bold text-white justify-between">
                         <h2 className="text-2xl text-black text-start font-bold ">レビュー</h2>
-                        <button className="bg-lime-green px-2 py-3 rounded-md">レビューを作る</button>
+                        {!iscreate &&
+                            <button className="bg-lime-green px-2 py-3 rounded-md transition-colors" onClick={()=>setIsCreate(true)}>レビューを作る</button>
+                        }
+
+                        {iscreate &&
+                            <button className="bg-red-300 px-2 py-3 rounded-md transition-colors" onClick={()=>setIsCreate(false)}>作るのをやめる</button>
+                        }
+                        
                     </div>
+
+                    {iscreate && 
+                        <Form action={formAction}>
+                            <input type="text" value={props.id} className="hidden" />
+                            <input type="text" className="text-black px-2 py-3 text-sm" />
+                        </Form>
+                    }
+
                     
                     {reviewku?.reviews.map((review)=>{
                         return (

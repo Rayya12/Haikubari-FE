@@ -5,6 +5,7 @@ import { cookies } from "next/headers"
 import {Haiku, MyHaikusResponse,Review,reviewResponse} from "./type"
 import { AsyncCallbackSet } from "next/dist/server/lib/async-callback-set"
 import { resolve } from "path"
+import { json } from "stream/consumers"
 
 
 const backendURL = process.env.BACKEND_URL
@@ -523,4 +524,28 @@ export async function  getReview(id:string) {
     const data = (await response.json()) as reviewResponse;
 
     return data;
+}
+
+export async function createReview(prevState : {error? :string}, formData : FormData) {
+    const kukis = await cookies();
+    const cToken = kukis.get("access_token")?.value;
+
+    const reviewCreate = {
+        haiku_id : formData.get("id"),
+        content : formData.get("content")
+    }
+
+    const response = await fetch(`${backendURL}/reviews/create`,{
+        method:"POST",
+        headers : {
+            Authorization : `Bearer ${cToken}`
+        },
+        body: JSON.stringify(reviewCreate)
+    })
+
+    if (!response.ok){
+        throw Error("レビューを作るのができません")
+    }
+
+    return true;
 }
