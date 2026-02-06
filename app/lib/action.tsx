@@ -535,17 +535,20 @@ export async function createReview(prevState : {error? :string}, formData : Form
         content : formData.get("content")
     }
 
+    console.log(reviewCreate)
+
     const response = await fetch(`${backendURL}/reviews/create`,{
         method:"POST",
         headers : {
+            'Content-Type' : 'application/json' ,
             Authorization : `Bearer ${cToken}`
         },
         body: JSON.stringify(reviewCreate)
     })
 
     if (!response.ok){
-        throw Error("レビューを作るのができません")
+        return {error : "レビューを作ることができません"}
     }
 
-    return true;
+    redirect(`/dashboard/common/haiku/${formData.get("id")}`)
 }

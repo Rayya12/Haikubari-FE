@@ -17,7 +17,7 @@ export default function ShowHaiku(props : {id:string}){
     const [numLikes,setNumLikes] = useState<Number>(0)
     const [reviewku, setReview] = useState<reviewResponse | null>(null)
     const [iscreate,setIsCreate] = useState<Boolean>(false)
-    const [state,formAction] = useActionState<>(createReview as any,initialState)
+    const [state,formAction] = useActionState(createReview as any,initialState)
 
     useEffect(()=>{
         async function run() {
@@ -140,14 +140,18 @@ export default function ShowHaiku(props : {id:string}){
 
                         {iscreate &&
                             <button className="bg-red-300 px-2 py-3 rounded-md transition-colors" onClick={()=>setIsCreate(false)}>作るのをやめる</button>
-                        }
-                        
+                        }  
                     </div>
 
                     {iscreate && 
                         <Form action={formAction}>
-                            <input type="text" value={props.id} className="hidden" />
-                            <input type="text" className="text-black px-2 py-3 text-sm" />
+                            <input type="text" id="id" name="id" value={props.id} className="hidden" onChange={()=>""}/>
+                            <label htmlFor="content" className="text-black">あなたのレビュー</label>
+                            <div className="flex space-x-2">
+                                <textarea id="content" name="content" className="flex w-7/8 h-24 text-black px-2 py-3 text-sm mt-1 border border-black rounded-md justify-items-start items-start text-start"/>
+                                <button type="submit" className="flex flex-grow bg-ateneo-blue text-white px-2 py-3 font-bold rounded-md h-12 text-center justify-center">送信</button>
+                            </div>
+                            
                         </Form>
                     }
 
