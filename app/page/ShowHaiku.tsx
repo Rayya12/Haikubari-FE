@@ -150,8 +150,7 @@ export default function ShowHaiku(props : {id:string}){
                             <div className="flex space-x-2">
                                 <textarea id="content" name="content" className="flex w-7/8 h-24 text-black px-2 py-3 text-sm mt-1 border border-black rounded-md justify-items-start items-start text-start"/>
                                 <button type="submit" className="flex flex-grow bg-ateneo-blue text-white px-2 py-3 font-bold rounded-md h-12 text-center justify-center">送信</button>
-                            </div>
-                            
+                            </div>     
                         </Form>
                     }
 
