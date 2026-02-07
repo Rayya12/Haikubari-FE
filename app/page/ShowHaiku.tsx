@@ -5,6 +5,7 @@ import { Haiku,reviewResponse ,Review} from "../lib/type";
 import { ThumbsUp } from "lucide-react";
 import { likes, unlikes,getIsLikes,getReview,createReview,handleDeleteHaiku} from "../lib/action";
 import Form from "next/form";
+import Link from "next/link";
 
 const initialState = {error :undefined as string | undefined}
 
@@ -162,6 +163,12 @@ export default function ShowHaiku(props : {id:string}){
                     }}>
                         俳句を消す
                     </button>
+                    }
+
+                    { isMine &&
+                    <Link href={`/dashboard/common/haiku/${props.id}/edit`} className="ml-2 flex p-4 text-white font-bold rounded-md hover:shadow-md bg-ateneo-blue">
+                        俳句を編集する
+                    </Link>
                     }
 
 
