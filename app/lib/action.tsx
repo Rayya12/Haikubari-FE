@@ -6,6 +6,7 @@ import {getByIDResponse, Haiku, MyHaikusResponse,Review,reviewResponse} from "./
 import { AsyncCallbackSet } from "next/dist/server/lib/async-callback-set"
 import { resolve } from "path"
 import { json } from "stream/consumers"
+import { error } from "console"
 
 
 const backendURL = process.env.BACKEND_URL
@@ -566,4 +567,71 @@ export async function handleDeleteHaiku(id:string){
 
     redirect("/dashboard/common/haiku/mine")
 
+}
+
+export async function handleEditHaiku(prevState : {error? :string}, formData : FormData){
+    const kukis = await cookies();
+    const cToken = kukis.get("access_token")?.value
+
+    const id = formData.get("id")?.toString();
+    if (!id){
+        return {error:"IDが見つかりません"}
+    }
+
+    const title = formData.get("title")?.toString();
+    if (!title || title.trim() === "") {
+        return { error: "タイトルを入れて下さい" };
+    }
+
+    const hashigo = formData.get("line1")?.toString();
+    if (!hashigo || hashigo.trim() === "") {
+        return { error: "第一行を入れて下さい" };
+    }
+    if (hashigo.length > 5){
+        return { error: "第一行は五文字まで入れて下さい" };
+    }
+
+    const nakasichi = formData.get("line2")?.toString();
+    if (!nakasichi || nakasichi.trim() === "") {
+        return { error: "第二行を入れて下さい" };
+    }
+    if (nakasichi.length > 7){
+        return { error: "第二行は七文字まで入れて下さい" };
+    }
+
+    const shimogo = formData.get("line3")?.toString();
+    if (!shimogo || shimogo.trim() === "") {
+        return { error: "第三行を入れて下さい" };
+    }
+    if (shimogo.length > 5){
+        return { error: "第三行は五文字まで入れて下さい" };
+    }
+
+    const description = formData.get("description")?.toString();
+
+    const request = {
+        title : title,
+        hashigo : hashigo,
+        nakasichi : nakasichi,
+        shimogo : shimogo,
+        description :description
+    }
+
+
+    const response = await fetch(`${backendURL}/haikus/${id}/edit`,
+        {
+            method : "PATCH",
+            headers : {
+                'Content-Type' : 'application/json',
+                Authorization : `Bearer ${cToken}`
+            },
+            body : JSON.stringify(request)
+        }
+    )
+
+    if (!response.ok){
+        return {error:"俳句を編集することができません"}
+    }
+
+    redirect(`/dashboard/common/haiku/${id}`)
 }

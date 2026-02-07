@@ -4,7 +4,7 @@ import Form from "next/form"
 import { useEffect, useState } from "react"
 import Link from "next/link"
 import { useActionState } from "react"
-import { getHaikuById, handleCreateHaiku } from "../lib/action"
+import { getHaikuById, handleEditHaiku } from "../lib/action"
 import { useSearchParams } from "next/navigation"
 
 const initialState = {
@@ -21,7 +21,7 @@ export default function EditHaiku(props : {id:string}){
     const [line2,setLine2] = useState('')
     const [line3,setLine3] = useState('')
     const [description,setDescription] = useState('')
-    const [state,formAction] = useActionState(handleCreateHaiku,initialState)
+    const [state,formAction] = useActionState(handleEditHaiku as any,initialState)
 
     const handleChangeTitle = (e:any) => {
         const title = e.target.value
@@ -104,6 +104,14 @@ export default function EditHaiku(props : {id:string}){
             </div>
         )}
 
+        {
+            err && (
+                <div className="flex justify-center items-center mt-8 text-red-600 text-2xl font-bold bg-red-400 border border-red-500 p-4 rounded-md w-full">
+                    {err}
+                </div>
+            )
+        }
+
         { !loading && (
         <div className="mt-20 space-y-4">
         <h1 className="block text-4xl font-bold text-center text-ateneo-blue">俳句の編集</h1>
@@ -115,6 +123,7 @@ export default function EditHaiku(props : {id:string}){
           )}
         </div>
         <Form action={formAction} className="flex items-center justify-center">
+            <input type="text"  value={props.id} id="id" name="id" className="hidden" readOnly />
             <div className="w-full max-w-lg">
                 <div className="mb-4">
                     <label htmlFor="title" className="block text-sm font-medium text-ateneo-blue">タイトル</label>
@@ -144,7 +153,7 @@ export default function EditHaiku(props : {id:string}){
                         onChange={handleChangeDescription}/>
                 </div>
                 <div className="flex w-full justify-end space-x-2">
-                    <Link href={"/dashboard/common/haiku/mine"} className="w-1/4 bg-ateneo-blue hover:ring-2 ring-lime-green text-white font-bold py-2 px-4 rounded text-center">戻ります</Link>
+                    <Link href={`/dashboard/common/haiku/${props.id}`} className="w-1/4 bg-ateneo-blue hover:ring-2 ring-lime-green text-white font-bold py-2 px-4 rounded text-center">戻ります</Link>
                     <button type="submit" className="w-1/4 bg-lime-green hover:ring-2 ring-ateneo-blue text-white font-bold py-2 px-4 rounded text-center">俳句を更新</button>
                 </div>
                 

@@ -165,7 +165,7 @@ export default function ShowHaiku(props : {id:string}){
                     </button>
                     }
 
-                    { isMine &&
+                    { isMine && props.id &&
                     <Link href={`/dashboard/common/haiku/${props.id}/edit`} className="ml-2 flex p-4 text-white font-bold rounded-md hover:shadow-md bg-ateneo-blue">
                         俳句を編集する
                     </Link>
