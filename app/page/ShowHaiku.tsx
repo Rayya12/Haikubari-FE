@@ -3,7 +3,7 @@ import { use, useActionState, useEffect, useState } from "react";
 import { getHaikuById } from "../lib/action"
 import { Haiku,reviewResponse ,Review} from "../lib/type";
 import { ThumbsUp } from "lucide-react";
-import { likes, unlikes,getIsLikes,getReview,createReview} from "../lib/action";
+import { likes, unlikes,getIsLikes,getReview,createReview,handleDeleteHaiku} from "../lib/action";
 import Form from "next/form";
 
 const initialState = {error :undefined as string | undefined}
@@ -18,16 +18,20 @@ export default function ShowHaiku(props : {id:string}){
     const [reviewku, setReview] = useState<reviewResponse | null>(null)
     const [iscreate,setIsCreate] = useState<Boolean>(false)
     const [state,formAction] = useActionState(createReview as any,initialState)
+    const [moreReview,setMoreReview] = useState<Boolean>(false)
+    const [confirm,setConfirm] = useState<Boolean>(false)
+    const [isMine,setIsMine] = useState<Boolean>(false)
 
     useEffect(()=>{
         async function run() {
             setLoading(true)
             try{
                 const [data,like,reviewres] = await Promise.all([getHaikuById(props.id), getIsLikes(props.id),getReview(props.id)])    
-                setHaiku(data)
+                setHaiku(data.haiku)
                 setIslike(like)
                 setReview(reviewres)
-                setNumLikes(data.likes)
+                setNumLikes(data.haiku.likes)
+                setIsMine(data.isMine)
             }catch(e:any){
                 setErr(e?.message ?? "failed to load")
             }finally{
@@ -42,7 +46,7 @@ export default function ShowHaiku(props : {id:string}){
         try{
             const [response,data] = await Promise.all([likes(props?.id),getHaikuById(props?.id)])
             setIslike(true)
-            setNumLikes(data?.likes)
+            setNumLikes(data?.haiku.likes)
 
         }catch(error:any){
             setErr(error?.message ?? "failed to likes")
@@ -54,7 +58,7 @@ export default function ShowHaiku(props : {id:string}){
         try{
             const [response,data] = await Promise.all([unlikes(props?.id),getHaikuById(props?.id)])
             setIslike(false);
-            setNumLikes(data?.likes);
+            setNumLikes(data?.haiku.likes);
         }catch(error:any){
             setErr(error?.message ?? "failed to likes")
         }
@@ -63,6 +67,32 @@ export default function ShowHaiku(props : {id:string}){
     
     return(
         <div className="flex flex-col pt-8 w-full items-center px-4">
+
+            {confirm && 
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+                    <div className="bg-white rounded-md p-6 w-[80%] max-w-sm shadow-lg">
+                        <h2 className="text-lg font-bold text-black">
+                            削除確認
+                        </h2>
+
+                        <p className="mt-2 text-sm text-gray-800">
+                            本当にこの俳句を消すんですか？
+                        </p>
+
+                        <div className="mt-6 flex justify-end gap-3">
+                            <button className="text-black px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-100"
+                            onClick={()=>setConfirm(false)}>
+                                キャンセル
+                            </button>
+
+                            <button className="px-4 py-2 rounded-md bg-red-600 text-white hover:bg-red-700" onClick={()=> handleDeleteHaiku(props.id)}>
+                                確認
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            }
+
             {loading && <div className="text-black text-2xl">
                 ロード
                 </div>}
@@ -126,6 +156,16 @@ export default function ShowHaiku(props : {id:string}){
                     </button>
                     }
 
+                    { isMine &&
+                    <button className="ml-2 flex p-4 text-white font-bold rounded-md hover:shadow-md bg-red-600" onClick={()=>{
+                        setConfirm(true)
+                    }}>
+                        俳句を消す
+                    </button>
+                    }
+
+
+
 
                     
                     
@@ -153,15 +193,54 @@ export default function ShowHaiku(props : {id:string}){
                             </div>     
                         </Form>
                     }
-
+                    {
+                        (reviewku == null || reviewku.reviews.length == 0) &&
+                        <div className="flex h-12 w-full bg-gray-200 text-black font-bold items-center justify-center mt-8 rounded-md">
+                            まだレビューがありません
+                        </div>
+                    }
                     
-                    {reviewku?.reviews.map((review)=>{
+                    {reviewku != null && reviewku?.reviews.length <= 3 && reviewku?.reviews.map((review)=>{
                         return (
                         <div className="text-black px-1 py-2 border-1 border-slate-500 rounded-md mt-4" key={review.id}>
                             <p className="text-xs font-bold mb-1">レビューユーザーの名前</p>
                             <p>{review.content}</p>
                         </div>)
                     })}
+
+                    {reviewku != null && reviewku?.reviews.length > 3 && !moreReview && <div> {reviewku?.reviews.slice(0,3).map((review)=>{
+                        return (
+                        <div className="text-black px-1 py-2 border-1 border-slate-500 rounded-md mt-4" key={review.id}>
+                            <p className="text-xs font-bold mb-1">レビューユーザーの名前</p>
+                            <p>{review.content}</p>
+                        </div>)
+                    })
+                
+                    }
+                        <div className="flex w-full justify-center mt-4">
+                            <button className="flex px-2 py-3 border-2 border-slate-400 rounded-md shadow-md hover:bg-slate-300 text-black" onClick={()=>setMoreReview(true)}>もっと見る</button>
+                        </div>
+                    
+                    </div>
+                    }
+
+                    {reviewku != null && reviewku?.reviews.length > 3 && moreReview && <div> {reviewku?.reviews.map((review)=>{
+                        return (
+                        <div className="text-black px-1 py-2 border-1 border-slate-500 rounded-md mt-4" key={review.id}>
+                            <p className="text-xs font-bold mb-1">レビューユーザーの名前</p>
+                            <p>{review.content}</p>
+                        </div>)
+                    })
+                
+                    }
+                        <div className="flex w-full justify-center mt-4">
+                            <button className="flex px-2 py-3 border-2 border-slate-400 rounded-md shadow-md hover:bg-slate-300 text-black" onClick={()=>setMoreReview(false)}>隠す</button>
+                        </div>
+                    
+                    </div>
+                    }
+
+
                     
 
 

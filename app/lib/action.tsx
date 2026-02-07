@@ -1,8 +1,8 @@
 'use server'
 
 import { redirect } from "next/navigation"
-import { cookies } from "next/headers"
-import {Haiku, MyHaikusResponse,Review,reviewResponse} from "./type"
+import { cookies, headers } from "next/headers"
+import {getByIDResponse, Haiku, MyHaikusResponse,Review,reviewResponse} from "./type"
 import { AsyncCallbackSet } from "next/dist/server/lib/async-callback-set"
 import { resolve } from "path"
 import { json } from "stream/consumers"
@@ -336,7 +336,7 @@ export async function handleCreateHaiku(prevState:{error?:string} | null,formDat
         return { error: "俳句の投稿に失敗しました" };
     }
 
-    redirect("/dashboard/common/my-haiku");
+    redirect("/dashboard/common/haiku/mine");
 }
 
 type GetMyHaikusParams = {
@@ -442,7 +442,7 @@ export async function getHaikuById(id:string) {
         throw new Error(`Failed to fetch haikus (${response.status}): ${errtext}`)
     }
 
-    const data = (await response.json()) as Haiku;
+    const data = (await response.json()) as getByIDResponse ;
     return data;
 
     
@@ -551,4 +551,19 @@ export async function createReview(prevState : {error? :string}, formData : Form
     }
 
     redirect(`/dashboard/common/haiku/${formData.get("id")}`)
+}
+
+export async function handleDeleteHaiku(id:string){
+    const kukis = await cookies();
+    const cToken = kukis.get("access_token")?.value
+
+    const response = await fetch(`${backendURL}/haikus/${id}`,{
+        method : "DELETE",
+        headers : {
+            Authorization : `Bearer ${cToken}`
+        }
+    })
+
+    redirect("/dashboard/common/haiku/mine")
+
 }

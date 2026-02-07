@@ -34,3 +34,8 @@ export type Review = {
 export type reviewResponse = {
   reviews : Review[]
 }
+
+export type getByIDResponse = {
+  haiku : Haiku,
+  isMine : boolean
+}
