@@ -39,3 +39,14 @@ export type getByIDResponse = {
   haiku : Haiku,
   isMine : boolean
 }
+
+export type userResponse = {
+  username : String,
+  email:String,
+  photo_url : String | null,
+  file_name : String | null,
+  file_type : String | null,
+  bio : String | null,
+  age : number,
+  address : String
+}

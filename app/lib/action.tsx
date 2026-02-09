@@ -2,7 +2,7 @@
 
 import { redirect } from "next/navigation"
 import { cookies, headers } from "next/headers"
-import {getByIDResponse, Haiku, MyHaikusResponse,Review,reviewResponse} from "./type"
+import {getByIDResponse, Haiku, MyHaikusResponse,Review,reviewResponse, userResponse} from "./type"
 import { AsyncCallbackSet } from "next/dist/server/lib/async-callback-set"
 import { resolve } from "path"
 import { json } from "stream/consumers"
@@ -634,4 +634,45 @@ export async function handleEditHaiku(prevState : {error? :string}, formData : F
     }
 
     redirect(`/dashboard/common/haiku/${id}`)
+}
+
+
+export async function getMe() {
+    const kukis = await cookies();
+    const cToken = kukis.get("access_token")?.value
+    
+    const response = await fetch(`${backendURL}/users/me`,{
+        method : "GET",
+        headers : {
+            Authorization : `Bearer ${cToken}`}
+    })
+
+    if (!response.ok){
+        throw Error("ユーザーが見つかりませんでした")
+    }
+
+    return (await response.json()) as userResponse
+
+    
+}
+
+export async function PatchMe() {
+    const kukis = await cookies();
+    const cToken = kukis.get("access_token")?.value
+    
+    const response = await fetch(`${backendURL}/users/me`,{
+        method : "PATCH",
+        headers : {
+            Authorization : `Bearer ${cToken}`,
+            'Content-Type' : 'application/json' 
+        }
+    })
+
+    if (!response.ok){
+        throw Error("ユーザーが見つかりませんでした")
+    }
+
+    return (await response.json()) as userResponse
+
+    
 }
