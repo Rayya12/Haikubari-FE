@@ -1,28 +1,99 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { getMe,PatchMe } from "../lib/action"
+import { auth, getMe,PatchMe } from "../lib/action"
+import { ImageKitUploadSuccess } from "../lib/type"
+
+const IMAGEKIT_PUBLIC_KEY = process.env.NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY!
 
 export default function Profile() {
   const [loading, setLoading] = useState(false)
   const [err, setErr] = useState<string | null>(null)
   const [edit, setEdit] = useState(false)
 
+  const [file,setFile] = useState<File | null>(null)
+  const [preview,setPreview] = useState<string | null>(null)
   const [userName, setUsername] = useState("")
   const [email, setEmail] = useState("")
   const [age, setAge] = useState("")
   const [address, setAddress] = useState("まだアドレスありません")
   const [bio, setBio] = useState("まだビオありません")
+  const [photoUrl,setPhotoUrl] = useState("")
+  const [fileType,setFileType] = useState("")
+  const [fileName,setFileName] = useState("")
 
-  const handleEdit = async () => {
-    try{
-      const response = await PatchMe(userName,"","","image",bio,age,address);
-    }catch(e:any){
-      setErr(e?.message ?? "編集失敗しました")
+  const handleFileChange = (e:React.ChangeEvent<HTMLInputElement>) => {
+    const selected = e.target.files?.[0]
+    if (!selected) return
+
+    if (!selected.type.startsWith("image/")){
+      setErr("プロファイル画面はイメージしかできません")
+      return
     }
+
+    setErr(null)
+    setFile(selected)
+    setPreview(URL.createObjectURL(selected))
+  }
+
+ const handleEdit = async () => {
+  setLoading(true)
+  
+  try {
+    const authData = await auth()
+    const formData = new FormData()
+    
+    if (file) {
+      formData.append("file", file)
+    }
+    
+    formData.append("fileName", fileName)
+    formData.append("publicKey", IMAGEKIT_PUBLIC_KEY)
+    formData.append("token", authData.token)
+    formData.append("signature", authData.signature)
+    formData.append("expire", String(authData.expire))
+    formData.append("folder", authData.folder)
+    
+    const uploadRes = await fetch(
+      "https://upload.imagekit.io/api/v1/files/upload",
+      {
+        method: "POST",
+        body: formData
+      }
+    )
+    
+    const result = await uploadRes.json() as ImageKitUploadSuccess
+    
+    if (!uploadRes.ok) throw new Error("アプロード失敗しました")
+    
+    let nextPhotoUrl = photoUrl
+    let nextFileName = fileName
+    let nextFileType = fileType
+    
+    // If file was uploaded, use new values
+    nextPhotoUrl = result.url
+    nextFileName = result.name
+    nextFileType = String(result.fileType)
+    
+    setPhotoUrl(nextPhotoUrl)
+    setFileName(nextFileName)
+    setFileType(nextFileType)
+    
+    alert("Upload berhasil!")
+    
+    // Use the next* variables here instead of state
+    const response = await PatchMe(userName, nextPhotoUrl, nextFileName, nextFileType, bio, age, address)
+    
     setErr(null)
     setEdit(false)
+    
+  } catch(e: any) {
+    const errmessage = e?.message ?? "アプロードが失敗しました"
+    setErr(errmessage)
+  } finally {
+    setLoading(false)
   }
+}
 
   const handleUserName = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value
@@ -46,7 +117,6 @@ export default function Profile() {
     
   }
 
-
   useEffect(() => {
     let cancelled = false
 
@@ -60,6 +130,9 @@ export default function Profile() {
 
         setUsername(String(response.username ?? ""))
         setEmail(String(response.email ?? ""))
+        setFileName(String(response.file_name))
+        setPhotoUrl(String(response.photo_url))
+        setFileType(String(response.file_type))
 
         if (response.address) setAddress(String(response.address))
         if (response.bio) setBio(String(response.bio))
@@ -78,6 +151,14 @@ export default function Profile() {
       cancelled = true
     }
   }, [])
+
+  useEffect(() => {
+  return () => {
+    if (preview) {
+      URL.revokeObjectURL(preview)
+    }
+  }
+  }, [preview])
 
   return (
     <div className="min-h-screen bg-white">
@@ -100,9 +181,14 @@ export default function Profile() {
             <div className="flex w-full items-center justify-between gap-4 flex-wrap">
               <div className="flex items-center gap-4 min-w-0">
                 <div
-                  className="h-36 w-36 rounded-full bg-green-600 bg-cover bg-center shrink-0"
-                  style={{ backgroundImage: "url(/loginBackground.png)" }}
-                />
+                  className="h-36 w-36 rounded-full bg-cover bg-center shrink-0 relative overflow-hidden"
+                  style={{ backgroundImage: `url(${preview ?? photoUrl ?? "/loginBackground.png"})` }}
+                >
+                {edit && <> <input type="file" accept="image/*" onChange={handleFileChange} className="absolute inset-0 opacity-0 cursor-pointer z-10"></input> <div className="absolute inset-0 bg-black/40 flex items-center justify-center text-white text-sm font-medium pointer-events-none">
+                    Ganti Foto
+                  </div></>}
+                  
+                </div>
                 <input
                   type="text"
                   value={userName}

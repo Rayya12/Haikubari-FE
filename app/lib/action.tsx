@@ -2,7 +2,7 @@
 
 import { redirect } from "next/navigation"
 import { cookies, headers } from "next/headers"
-import {getByIDResponse, Haiku, MyHaikusResponse,Review,reviewResponse, userResponse} from "./type"
+import {getByIDResponse, Haiku, ImageKitAuthResponse, MyHaikusResponse,Review,reviewResponse, userResponse} from "./type"
 import { AsyncCallbackSet } from "next/dist/server/lib/async-callback-set"
 import { resolve } from "path"
 import { json } from "stream/consumers"
@@ -689,4 +689,25 @@ export async function PatchMe(username:string,photo_url:String,file_name:string,
     return (await response.json()) as userResponse
 
     
+}
+
+
+export async function auth() {
+    const kukis = await cookies();
+    const cToken = kukis.get("access_token")?.value
+
+    const response = await fetch(`${backendURL}/imagekit/auth`,{
+        method : "GET",
+        headers : {
+            Authorization : `Bearer ${cToken}`
+        }
+    })
+
+    if (!response.ok){
+        throw Error("認証が失敗しました")
+    }
+    
+    const data = await response.json() as ImageKitAuthResponse
+
+    return data
 }

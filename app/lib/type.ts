@@ -50,3 +50,17 @@ export type userResponse = {
   age : number,
   address : String
 }
+
+export type ImageKitAuthResponse = {
+  token: string
+  expire: number // unix timestamp
+  signature: string
+  folder: string
+}
+
+export type ImageKitUploadSuccess = {
+  fileId: string
+  url: string
+  name: string
+  fileType?: string
+}
