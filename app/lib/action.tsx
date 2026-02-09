@@ -9,7 +9,7 @@ import { json } from "stream/consumers"
 import { error } from "console"
 
 
-const backendURL = process.env.BACKEND_URL
+const backendURL = process.env.NEXT_PUBLIC_BACKEND_URL
 
 // Register action
 export async function  handleRegister(prevState : {error?:string} | null,formData:FormData) {
