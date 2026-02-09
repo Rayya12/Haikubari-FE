@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { getMe } from "../lib/action"
+import { getMe,PatchMe } from "../lib/action"
 
 export default function Profile() {
   const [loading, setLoading] = useState(false)
@@ -13,6 +13,39 @@ export default function Profile() {
   const [age, setAge] = useState("")
   const [address, setAddress] = useState("まだアドレスありません")
   const [bio, setBio] = useState("まだビオありません")
+
+  const handleEdit = async () => {
+    try{
+      const response = await PatchMe(userName,"","","image",bio,age,address);
+    }catch(e:any){
+      setErr(e?.message ?? "編集失敗しました")
+    }
+    setErr(null)
+    setEdit(false)
+  }
+
+  const handleUserName = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value
+    if (value === ""){
+      setErr("ユーサネームを入れて下さい")
+    }
+    if (value.length !=0 ){
+      setUsername(value)  
+    }
+     
+  }
+
+  const handleAge = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value
+    if (Number(value) < 1){
+      setErr("年齢は一以上です")
+    }
+    if (Number(value)>=1){
+      setAge(value)  
+    }
+    
+  }
+
 
   useEffect(() => {
     let cancelled = false
@@ -73,7 +106,7 @@ export default function Profile() {
                 <input
                   type="text"
                   value={userName}
-                  onChange={(e) => setUsername(e.target.value)}
+                  onChange={handleUserName}
                   className="min-w-0 w-full max-w-xl h-fit text-3xl font-bold text-black border-2 border-ateneo-blue disabled:border-0 px-3 py-2 rounded-md"
                   disabled={!edit}
                 />
@@ -90,7 +123,7 @@ export default function Profile() {
                 ) : (
                   <button
                     className="rounded-md bg-ateneo-blue px-6 py-4 font-bold text-white transition-colors hover:shadow-md"
-                    onClick={() => setEdit(false)}
+                    onClick={handleEdit}
                   >
                     編集済み
                   </button>
@@ -126,7 +159,7 @@ export default function Profile() {
                     id="age"
                     name="age"
                     value={age}
-                    onChange={(e) => setAge(e.target.value)}
+                    onChange={handleAge}
                     disabled={!edit}
                     className="w-full px-3 py-4 border-2 border-ateneo-blue rounded-md text-xl text-black disabled:border disabled:border-ateneo-blue"
                   />

@@ -656,20 +656,34 @@ export async function getMe() {
     
 }
 
-export async function PatchMe() {
+export async function PatchMe(username:string,photo_url:String,file_name:string,file_type:string,bio:string,age:string,address:string) {
     const kukis = await cookies();
     const cToken = kukis.get("access_token")?.value
+
+    const request = {
+        username : username,
+        photo_url : photo_url,
+        file_name : file_name,
+        file_type : file_type,
+        bio : bio,
+        age : Number(age),
+        address : address
+    }
+
+    console.log(request)
     
     const response = await fetch(`${backendURL}/users/me`,{
         method : "PATCH",
         headers : {
             Authorization : `Bearer ${cToken}`,
             'Content-Type' : 'application/json' 
-        }
+        },
+        body: JSON.stringify(request)
     })
 
     if (!response.ok){
-        throw Error("ユーザーが見つかりませんでした")
+        const errtext = response.text().catch(()=>"")
+        throw Error(`error happen with status code${response.status}:${errtext}`)
     }
 
     return (await response.json()) as userResponse
