@@ -442,8 +442,8 @@ export async function getHaikuById(id:string) {
         const errtext = await response.text().catch(()=>"")
         throw new Error(`Failed to fetch haikus (${response.status}): ${errtext}`)
     }
-
     const data = (await response.json()) as getByIDResponse ;
+    
     return data;
 
     
@@ -711,3 +711,4 @@ export async function auth() {
 
     return data
 }
+

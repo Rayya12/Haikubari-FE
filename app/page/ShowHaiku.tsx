@@ -1,7 +1,7 @@
 "use client"
 import { use, useActionState, useEffect, useState } from "react";
 import { getHaikuById } from "../lib/action"
-import { Haiku,reviewResponse ,Review} from "../lib/type";
+import { Haiku,reviewResponse ,Review, userResponse} from "../lib/type";
 import { ThumbsUp } from "lucide-react";
 import { likes, unlikes,getIsLikes,getReview,createReview,handleDeleteHaiku} from "../lib/action";
 import Form from "next/form";
@@ -22,6 +22,7 @@ export default function ShowHaiku(props : {id:string}){
     const [moreReview,setMoreReview] = useState<Boolean>(false)
     const [confirm,setConfirm] = useState<Boolean>(false)
     const [isMine,setIsMine] = useState<Boolean>(false)
+    const [user, setUser] = useState<userResponse | null>(null)
 
     useEffect(()=>{
         async function run() {
@@ -29,10 +30,12 @@ export default function ShowHaiku(props : {id:string}){
             try{
                 const [data,like,reviewres] = await Promise.all([getHaikuById(props.id), getIsLikes(props.id),getReview(props.id)])    
                 setHaiku(data.haiku)
+
                 setIslike(like)
                 setReview(reviewres)
                 setNumLikes(data.haiku.likes)
                 setIsMine(data.isMine)
+                setUser(data.user)
             }catch(e:any){
                 setErr(e?.message ?? "failed to load")
             }finally{
@@ -140,19 +143,26 @@ export default function ShowHaiku(props : {id:string}){
 
                 <div className="flex w-full justify-end mt-8">
 
-                    <div className="flex p-4 text-black">
+                    {!isMine && (
+                        <div className="flex flex-grow p-4 text-black font-bold border-2 border-slate-400 rounded-md items-center space-x-4">
+                            <div className="flex w-10 h-10 rounded-full bg-green-500" style={{backgroundImage:`url(${user?.photo_url ?? "/loginBackground.png"})`}}></div>
+                            <p>{user?.username}</p>
+                        </div>)
+                    }
+
+                    <div className="flex p-4 text-black items-center">
                         いいね回数：{String(numLikes)}
                     </div>
 
                     {!isLikes && 
-                    <button className="flex p-4 bg-white text-black font-bold rounded-md hover:shadow-md border border-slate-600 transition-colors" onClick={handleLike}>
+                    <button className="flex p-4 bg-white text-black font-bold rounded-md hover:shadow-md border border-slate-600 transition-colors items-center" onClick={handleLike}>
                         🤍いいね
                     </button>
                     }
 
                     
                     {isLikes && 
-                    <button className="flex p-4 text-black font-bold rounded-md hover:shadow-md bg-red-300 border border-red-600 transition-colors" onClick={handleUnlike}>
+                    <button className="flex p-4 text-black font-bold rounded-md hover:shadow-md bg-red-300 border border-red-600 transition-colors items-center" onClick={handleUnlike}>
                         ❤️ いいね
                     </button>
                     }

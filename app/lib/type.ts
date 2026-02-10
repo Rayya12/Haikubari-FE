@@ -37,7 +37,8 @@ export type reviewResponse = {
 
 export type getByIDResponse = {
   haiku : Haiku,
-  isMine : boolean
+  isMine : boolean,
+  user : userResponse
 }
 
 export type userResponse = {
