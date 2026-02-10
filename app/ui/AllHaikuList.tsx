@@ -54,7 +54,7 @@ export default function AllHaikuList() {
     function setParams(next:Partial<{page:number;page_size:number;q:string;sort:"created_at" | "likes";order:"asc" | "desc"}>){
         const params = new URLSearchParams(sp.toString());
         if (next.page !== undefined) params.set("page",String(next.page));
-        if (next.page_size ! == undefined) params.set("page_size",String(next.page_size));
+        if (next.page_size !== undefined) params.set("page_size",String(next.page_size));
         if (next.q !== undefined){
             if (next.q) params.set("q",next.q);
             else params.delete("q");
@@ -124,6 +124,7 @@ export default function AllHaikuList() {
               <option value="desc">desc</option>
               <option value="asc">asc</option>
             </select>
+
 
             <select
               value={pageSize}

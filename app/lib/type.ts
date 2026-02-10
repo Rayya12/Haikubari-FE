@@ -23,6 +23,7 @@ export type MyHaikusResponse = {
 
 
 export type Review = {
+  user : userResponse
   id: string;
   user_id : string;
   haiku_id : string;

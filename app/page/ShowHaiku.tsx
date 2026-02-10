@@ -220,7 +220,7 @@ export default function ShowHaiku(props : {id:string}){
                     {reviewku != null && reviewku?.reviews.length <= 3 && reviewku?.reviews.map((review)=>{
                         return (
                         <div className="text-black px-1 py-2 border-1 border-slate-500 rounded-md mt-4" key={review.id}>
-                            <p className="text-xs font-bold mb-1">レビューユーザーの名前</p>
+                            <p className="text-xs font-bold mb-1">{review.user.username}</p>
                             <p>{review.content}</p>
                         </div>)
                     })}
