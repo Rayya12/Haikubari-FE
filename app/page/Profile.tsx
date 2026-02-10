@@ -45,7 +45,7 @@ export default function Profile() {
     
     if (file) {
       formData.append("file", file)
-    }
+    
     
     formData.append("fileName", fileName)
     formData.append("publicKey", IMAGEKIT_PUBLIC_KEY)
@@ -78,11 +78,14 @@ export default function Profile() {
     setPhotoUrl(nextPhotoUrl)
     setFileName(nextFileName)
     setFileType(nextFileType)
-    
-    alert("Upload berhasil!")
-    
+
     // Use the next* variables here instead of state
     const response = await PatchMe(userName, nextPhotoUrl, nextFileName, nextFileType, bio, age, address)
+    
+    alert("Upload berhasil!")
+    }else {
+      const response = await PatchMe(userName,photoUrl,fileName,fileType,bio,age,address)
+    }
     
     setErr(null)
     setEdit(false)
