@@ -95,6 +95,14 @@ export default function AllHaikuList() {
             <input
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
+              onKeyDown={(e)=>{
+                e.preventDefault()
+                if (e.key == "Enter"){
+                  setParams({q:searchInput, page:1})
+                  setSearchInput("")
+                
+                }
+              }}
               placeholder="検索 (title / 5-7-5)"
               className="w-full md:w-64 rounded-md border border-ateneo-blue bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ateneo-blue text-black"
             />

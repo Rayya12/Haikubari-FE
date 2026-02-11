@@ -145,7 +145,7 @@ export default function ShowHaiku(props : {id:string}){
 
                     {!isMine && (
                         <div className="flex flex-grow p-4 text-black font-bold border-2 border-slate-400 rounded-md items-center space-x-4">
-                            <div className="flex w-10 h-10 rounded-full bg-green-500" style={{backgroundImage:`url(${user?.photo_url ?? "/loginBackground.png"})`}}></div>
+                            <div className="flex w-10 h-10 rounded-full bg-cover bg-center shrink-0" style={{backgroundImage:`url(${user?.photo_url ?? "/loginBackground.png"})`}}></div>
                             <p>{user?.username}</p>
                         </div>)
                     }

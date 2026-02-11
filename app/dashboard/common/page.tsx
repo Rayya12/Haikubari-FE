@@ -1,110 +1,33 @@
 'use client'
+import Image from "next/image"
+import Link from "next/link"
 
-import { useState } from "react"
 
-const backendURL = process.env.NEXT_PUBLIC_BACKEND_URL
-const IMAGEKIT_PUBLIC_KEY = process.env.NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY!
+export default function homePage(){
+    return(
+    <div className="flex min-h-screen w-full bg-cover bg-center justify-center" style={{backgroundImage:(`url(/backgroundHome.png)`)}}>
+        <div className="flex flex-col-reverse md:flex-row gap-4 justify-center items-center md:justify-center">
 
-export default function ImageUploadForm() {
-  const [file, setFile] = useState<File | null>(null)
-  const [loading, setLoading] = useState(false)
-  const [preview, setPreview] = useState<string | null>(null)
-  const [error, setError] = useState<string | null>(null)
+            <div className="flex flex-col">
+                <div className="text-5xl text-ateneo-blue font-bold">
+                    今を大切に<br/>
+                    俳句を作ろう
+                 </div>
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selected = e.target.files?.[0]
-    if (!selected) return
+                 <div className="flex space-x-4 mt-8">
+                    <Link href={"/dashboard/common/haiku/mine/create"} className="px-3 py-2 border border-lime-green rounded-md text-lime-green  text-xl hover:bg-slate-100">俳句を作る</Link>
+                    <Link href={"/dashboard/common/haiku/mine/create"} className="px-3 py-2 bg-ateneo-blue rounded-md text-white text-xl hover:bg-gray-800">俳句を学ぶ</Link>
+                </div>
 
-    if (!selected.type.startsWith("image/")) {
-      setError("File harus berupa gambar")
-      return
-    }
+            </div>
 
-    setError(null)
-    setFile(selected)
-    setPreview(URL.createObjectURL(selected))
-  }
+            
 
-  const handleUpload = async () => {
-    if (!file) return
-    setLoading(true)
+            
 
-    try {
-      // 1️⃣ ambil auth dari FastAPI
-      const authRes = await fetch(`${backendURL}/imagekit/auth`, {
-        credentials: "include"
-      })
+            <Image src={"/HaikubariMan.png"} alt="俳句張りのヒーロー画面" height={350} width={300}></Image>
 
-      if (!authRes.ok) {
-        throw new Error("Gagal ambil auth ImageKit")
-      }
-
-      const auth = await authRes.json()
-
-      // 2️⃣ upload ke ImageKit
-      const formData = new FormData()
-      formData.append("file", file)
-      formData.append("fileName", file.name)
-      formData.append("publicKey", IMAGEKIT_PUBLIC_KEY)
-      formData.append("token", auth.token)
-      formData.append("signature", auth.signature)
-      formData.append("expire", auth.expire)
-      formData.append("folder", auth.folder)
-
-      const uploadRes = await fetch(
-        "https://upload.imagekit.io/api/v1/files/upload",
-        {
-          method: "POST",
-          body: formData
-        }
-      )
-
-      const result = await uploadRes.json()
-
-      if (!uploadRes.ok) {
-        throw new Error(result?.message ?? "Upload gagal")
-      }
-
-      console.log("Upload success:", result)
-      alert("Upload berhasil!")
-
-    } catch (err: any) {
-      setError(err.message ?? "Terjadi kesalahan")
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  return (
-    <div className="flex flex-col gap-4 max-w-sm p-4 border rounded-md">
-      <h2 className="text-lg font-bold">Upload Image</h2>
-
-      <input
-        type="file"
-        accept="image/*"
-        onChange={handleFileChange}
-        className="text-sm"
-      />
-
-      {preview && (
-        <img
-          src={preview}
-          alt="preview"
-          className="w-40 h-40 object-cover rounded-md border"
-        />
-      )}
-
-      {error && (
-        <p className="text-red-600 text-sm">{error}</p>
-      )}
-
-      <button
-        onClick={handleUpload}
-        disabled={!file || loading}
-        className="bg-black text-white px-4 py-2 rounded-md disabled:opacity-50"
-      >
-        {loading ? "Uploading..." : "Upload"}
-      </button>
-    </div>
-  )
+            
+        </div>
+    </div>)
 }

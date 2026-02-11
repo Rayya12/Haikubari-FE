@@ -1,11 +1,11 @@
-import { User} from "lucide-react"
+import { User,Home} from "lucide-react"
 import Link from "next/link"
 
 export default function setting(){
 
     const menu = [
     {href:"/dashboard/common/settings/profile",label:"プロファイル",icon:User},
-    {href:"/dashboard/common/",label:"まだありません",icon:User}
+    {href:"/dashboard/common/",label:"ホームページ",icon:Home}
     ]
 
     return <div className="min-h-screen w-full bg-white p-8">

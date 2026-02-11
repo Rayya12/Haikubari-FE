@@ -18,7 +18,7 @@ export default function SidebarNav(){
     const pathname = usePathname();
 
     return(
-<aside className="bg-white h-screen w-[280px] border-r border-slate-200 shadow-md p-4 flex flex-col sticky top-0">
+<aside className="bg-white h-screen w-[100px] md:w-[280px] border-r border-slate-200 shadow-md p-4 flex flex-col sticky top-0">
   {/* Logo */}
   <div className="pt-8 pb-6">
     <Image src="/blacklogo.png" alt="俳句配りのロゴ" width={300} height={300} />
@@ -45,7 +45,7 @@ export default function SidebarNav(){
               )}
             >
               <Icon className="h-5 w-5" strokeWidth={2.2} />
-              <span className="text-lg font-bold tracking-tight">
+              <span className="text-lg font-bold tracking-tight hidden md:block">
                 {it.label}
               </span>
             </Link>
@@ -58,7 +58,8 @@ export default function SidebarNav(){
     <div className="mt-auto pt-6 mb-4">
       <button className="w-full flex items-center gap-3 rounded-md bg-red-400 px-4 py-3 text-white font-bold hover:bg-red-500 transition-colors" onClick={handleLogout}>
         <LogOut className="h-5 w-5" strokeWidth={2.2} />
-        ログアウト
+        <p className="hidden md:block">ログアウト</p>
+        
       </button>
     </div>
   </nav>

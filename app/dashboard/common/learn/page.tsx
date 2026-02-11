@@ -137,8 +137,8 @@ export default function ChatbotUI() {
             <Bot className="w-6 h-6 text-white" />
           </div>
           <div>
-            <h1 className="text-xl font-semibold text-slate-800">AI Chatbot</h1>
-            <p className="text-sm text-slate-500">Always here to help</p>
+            <h1 className="text-xl font-semibold text-slate-800">俳句AI</h1>
+            <p className="text-sm text-slate-500">俳句について何でもお聞きください</p>
           </div>
         </div>
       </div>
@@ -153,7 +153,7 @@ export default function ChatbotUI() {
                 俳句AI
               </h2>
               <p className="text-slate-500">
-                もしわからないことがあったら、お聞きください
+                俳句について何でもお聞きください
               </p>
             </div>
           )}
@@ -193,7 +193,7 @@ export default function ChatbotUI() {
 
           {isLoading && messages[messages.length - 1]?.role === 'user' && (
             <div className="flex gap-3 justify-start">
-              <div className="bg-gradient-to-br from-blue-500 to-purple-600 p-2 rounded-lg h-fit">
+              <div className="bg-ateneo-blue p-2 rounded-lg h-fit">
                 <Bot className="w-5 h-5 text-white" />
               </div>
               <div className="bg-white rounded-2xl px-4 py-3 shadow-sm border border-slate-200">

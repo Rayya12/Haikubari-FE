@@ -188,7 +188,7 @@ export default function MyHaikuPage() {
           <button
             disabled={safePage <= 1}
             onClick={() => setParams({ page: safePage - 1 })}
-            className="rounded-md border bg-ateneo-blue px-3 py-2 text-sm disabled:opacity-40"
+            className="rounded-md border bg-ateneo-blue px-3 py-2 text-sm disabled:opacity-40 text-white"
           >
             前へ
           </button>
@@ -236,7 +236,7 @@ export default function MyHaikuPage() {
             onClick={() => setParams({ page: safePage + 1 })}
             className="rounded-md border bg-ateneo-blue px-3 py-2 text-sm text-white disabled:opacity-40"
           >
-            Next
+            次へ
           </button>
         </div>
       )}
