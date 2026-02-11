@@ -12,6 +12,7 @@ export default function ChatbotUI() {
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   const scrollToBottom = () => {
@@ -132,7 +133,7 @@ export default function ChatbotUI() {
       {/* Header */}
       <div className="bg-white border-b border-slate-200 px-6 py-4 shadow-sm">
         <div className="max-w-4xl mx-auto flex items-center gap-3">
-          <div className="bg-gradient-to-br from-blue-500 to-purple-600 p-2 rounded-lg">
+          <div className="bg-ateneo-blue p-2 rounded-lg">
             <Bot className="w-6 h-6 text-white" />
           </div>
           <div>
@@ -149,10 +150,10 @@ export default function ChatbotUI() {
             <div className="text-center py-12">
               <Bot className="w-16 h-16 mx-auto text-slate-300 mb-4" />
               <h2 className="text-2xl font-semibold text-slate-700 mb-2">
-                Start a conversation
+                俳句AI
               </h2>
               <p className="text-slate-500">
-                Ask me anything! I'm here to help.
+                もしわからないことがあったら、お聞きください
               </p>
             </div>
           )}
@@ -165,7 +166,7 @@ export default function ChatbotUI() {
               }`}
             >
               {message.role === 'assistant' && (
-                <div className="bg-gradient-to-br from-blue-500 to-purple-600 p-2 rounded-lg h-fit">
+                <div className="bg-ateneo-blue p-2 rounded-lg h-fit">
                   <Bot className="w-5 h-5 text-white" />
                 </div>
               )}
@@ -173,8 +174,8 @@ export default function ChatbotUI() {
               <div
                 className={`rounded-2xl px-4 py-3 max-w-[80%] ${
                   message.role === 'user'
-                    ? 'bg-gradient-to-br from-blue-500 to-purple-600 text-white'
-                    : 'bg-white text-slate-800 shadow-sm border border-slate-200'
+                    ? 'bg-lime-green text-white'
+                    : 'bg-white text-ateneo-blue shadow-sm border border-slate-200'
                 }`}
               >
                 <p className="whitespace-pre-wrap break-words">
@@ -183,7 +184,7 @@ export default function ChatbotUI() {
               </div>
 
               {message.role === 'user' && (
-                <div className="bg-slate-700 p-2 rounded-lg h-fit">
+                <div className="bg-ateneo-blue p-2 rounded-lg h-fit">
                   <User className="w-5 h-5 text-white" />
                 </div>
               )}
@@ -219,30 +220,26 @@ export default function ChatbotUI() {
                     handleSubmit(e)
                   }
                 }}
-                placeholder="Type your message..."
+                placeholder="メッセージを入力してください..."
                 rows={1}
                 className="w-full px-4 py-3 bg-transparent resize-none outline-none text-slate-800 placeholder:text-slate-400 max-h-32"
                 style={{
                   minHeight: '24px',
                   height: 'auto',
                 }}
-                onInput={(e) => {
-                  const target = e.target as HTMLTextAreaElement
-                  target.style.height = 'auto'
-                  target.style.height = target.scrollHeight + 'px'
-                }}
+                
               />
             </div>
             <button
               type="submit"
               disabled={!input.trim() || isLoading}
-              className="bg-gradient-to-br from-blue-500 to-purple-600 text-white p-3 rounded-xl hover:from-blue-600 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl active:scale-95"
+              className="bg-lime-green text-white p-3 rounded-xl hover:bg-ateneo-blue disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl active:scale-95"
             >
               <Send className="w-5 h-5" />
             </button>
           </div>
           <p className="text-xs text-slate-400 mt-2 text-center">
-            Press Enter to send, Shift + Enter for new line
+            エンターで送信、シフト✙エンターで新しい文
           </p>
         </form>
       </div>
