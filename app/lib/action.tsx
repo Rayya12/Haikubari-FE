@@ -3,10 +3,6 @@
 import { redirect } from "next/navigation"
 import { cookies, headers } from "next/headers"
 import {getByIDResponse, Haiku, ImageKitAuthResponse, MyHaikusResponse,Review,reviewResponse, userResponse} from "./type"
-import { AsyncCallbackSet } from "next/dist/server/lib/async-callback-set"
-import { resolve } from "path"
-import { json } from "stream/consumers"
-import { error } from "console"
 
 
 const backendURL = process.env.NEXT_PUBLIC_BACKEND_URL

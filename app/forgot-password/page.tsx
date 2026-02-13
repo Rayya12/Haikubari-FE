@@ -1,10 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import Form from "next/form";
-import Link from "next/link";
-import { useActionState } from "react";
-import { handleLogin } from "../lib/action";
+import Link from "next/link";;
 import { useState } from "react";
 
 export default function ForgotPasswordPage() {
@@ -14,6 +11,19 @@ export default function ForgotPasswordPage() {
   const handleEmail = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value);
   };
+
+  const handleForgotPassword = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault()
+    try {
+        const response = await fetch("api/auth/forgot-password",{
+            method : "POST",
+            headers: { 'Content-Type': 'application/json' },
+            body : JSON.stringify({email})
+        })
+    }catch (e:any) {
+        setError(e?.message ?? "失敗しましたしばらくお待ちください。")
+    }
+  }
 
   return (
     <div
@@ -52,7 +62,7 @@ export default function ForgotPasswordPage() {
 
         <button
           className="bg-lime-green text-white p-4 rounded-md shadow-md w-3/4 mt-4 mb-4 hover:ring-2 hover:ring-teal"
-          type="submit"
+          onClick={handleForgotPassword}
         >
           確認
         </button>
