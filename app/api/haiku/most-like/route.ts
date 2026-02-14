@@ -14,7 +14,7 @@ export async function GET(request: Request) {
   }
 
   try {
-    const response = await fetch(`${backendURL}/all/topLike?sort=${encodeURIComponent(sort)}`, {
+    const response = await fetch(`${backendURL}/haikus/all/topLike?sort=${encodeURIComponent(sort)}`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${cToken}`,

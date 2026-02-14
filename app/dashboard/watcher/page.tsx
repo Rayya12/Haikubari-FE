@@ -1,16 +1,18 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import { TrendingUp } from "lucide-react"
 import { Bar, BarChart, XAxis, YAxis } from "recharts"
+import { handleLogout } from "@/app/lib/action"
 
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+
 
 import {
   ChartContainer,
@@ -19,132 +21,182 @@ import {
   type ChartConfig,
 } from "@/components/ui/chart"
 
-export const description = "A horizontal bar chart"
+type LikeTopItem = {
+  title: string
+  likes: number
+}
 
-const chartData = [
-  { month: "January", desktop: 186 },
-  { month: "February", desktop: 305 },
-  { month: "March", desktop: 237 },
-  { month: "April", desktop: 73 },
-  { month: "May", desktop: 209 },
-  { month: "June", desktop: 214 },
-]
+type CommentTopItem = {
+  title: string
+  review_count: number
+}
 
 const chartConfig = {
-  desktop: {
-    label: "Desktop",
+  value: {
+    label: "Count",
     color: "var(--chart-1)",
   },
 } satisfies ChartConfig
 
 export default function WatcherDashboard() {
+  const [mostLiked, setMostLiked] = useState<Array<{ label: string; value: number }>>([])
+  const [mostCommented, setMostCommented] = useState<Array<{ label: string; value: number }>>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    let cancelled = false
+
+    async function load() {
+      try {
+        setLoading(true)
+        setError(null)
+
+        const [likeRes, commentRes] = await Promise.all([
+          fetch("/api/haiku/most-like?sort=desc", { method: "GET", cache: "no-store" }),
+          fetch("/api/haiku/most-comments?sort=desc", { method: "GET", cache: "no-store" }),
+        ])
+
+        if (!likeRes.ok) throw new Error("Failed to fetch most-like")
+        if (!commentRes.ok) throw new Error("Failed to fetch most-comment")
+
+        const likeJson: LikeTopItem[] = await likeRes.json()
+        const commentJson: CommentTopItem[] = await commentRes.json()
+
+        if (cancelled) return
+
+        // Recharts data format: [{ label: "...", value: 123 }, ...]
+        setMostLiked(
+          likeJson.map((x) => ({
+            label: x.title.length > 5 ? x.title.slice(0,5) + "..." : x.title ,
+            value: x.likes,
+          }))
+        )
+
+        setMostCommented(
+          commentJson.map((x) => ({
+            label: x.title.length > 5 ? x.title.slice(0,5) + "..." : x.title,
+            value: x.review_count,
+          }))
+        )
+      } catch (e) {
+        if (cancelled) return
+        setError(e instanceof Error ? e.message : "Unknown error")
+      } finally {
+        if (cancelled) return
+        setLoading(false)
+      }
+    }
+
+    load()
+
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
   return (
-    <div className="bg-white min-h-screen">
-      <div className="flex items-center justify-center min-h-screen space-x-4">
-        <div>
-        <Card>
+    <div className="flex flex-col bg-white min-h-screen items-center justify-center">
+        <h1 className="flex text-4xl font-bold text-ateneo-blue mb-8">監視者のダッシュボード</h1>
+        {/* Most liked */}
+        <div className="flex w-full space-x-4 items-center justify-center">
+        <Card className="w-full max-w-xl">
           <CardHeader>
-            <CardTitle>最もいいねされた俳句</CardTitle>
+            <CardTitle className="text-2xl">最もいいねされた俳句</CardTitle>
           </CardHeader>
 
           <CardContent>
-            <ChartContainer config={chartConfig}>
-              <BarChart
-                accessibilityLayer
-                data={chartData}
-                layout="vertical"
-                margin={{ left: -20 }}
-              >
-                <XAxis type="number" dataKey="desktop" hide />
-
-                <YAxis
-                  dataKey="month"
-                  type="category"
-                  tickLine={false}
-                  tickMargin={10}
-                  axisLine={false}
-                  tickFormatter={(value) => value.slice(0, 3)}
-                />
-
-                <ChartTooltip
-                  cursor={false}
-                  content={<ChartTooltipContent hideLabel />}
-                />
-
-                <Bar
-                  dataKey="desktop"
-                  fill="var(--color-desktop)"
-                  radius={5}
-                />
-              </BarChart>
-            </ChartContainer>
+            {loading ? (
+              <div className="text-sm text-muted-foreground">Loading...</div>
+            ) : error ? (
+              <div className="text-sm text-red-600">{error}</div>
+            ) : (
+              <ChartContainer config={chartConfig}>
+                <BarChart
+                  accessibilityLayer
+                  data={mostLiked}
+                  layout="vertical"
+                  margin={{ left: 0 }}
+                >
+                  <XAxis type="number" dataKey="value" hide />
+                  <YAxis className="font-bold text-xl"
+                    dataKey="label"
+                    type="category"
+                    tickLine={false}
+                    tickMargin={10}
+                    axisLine={false}
+                    width={180}
+                    tickFormatter={(value) =>
+                      typeof value === "string" ? value.slice(0, 12) : String(value)
+                    }
+                  />
+                  <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
+                  <Bar dataKey="value" fill="var(--color-value)" radius={5} />
+                </BarChart>
+              </ChartContainer>
+            )}
           </CardContent>
 
           <CardFooter className="flex-col items-start gap-2 text-sm">
             <div className="flex gap-2 leading-none font-medium">
-              Trending up by 5.2% this month
-              <TrendingUp className="h-4 w-4" />
+              俳句張り実際データからとりました <TrendingUp className="h-4 w-4" />
             </div>
-
             <div className="text-muted-foreground leading-none">
-              Showing total visitors for the last 6 months
+              Showing top haiku by likes
             </div>
           </CardFooter>
         </Card>
-        </div>
 
-        <div>
-        <Card>
+        {/* Most commented */}
+        <Card className="w-full max-w-xl">
           <CardHeader>
-            <CardTitle>最もコメントされた俳句</CardTitle>
+            <CardTitle className="text-2xl">最もコメントされた俳句</CardTitle>
           </CardHeader>
 
           <CardContent>
-            <ChartContainer config={chartConfig}>
-              <BarChart
-                accessibilityLayer
-                data={chartData}
-                layout="vertical"
-                margin={{ left: -20 }}
-              >
-                <XAxis type="number" dataKey="desktop" hide />
-
-                <YAxis
-                  dataKey="month"
-                  type="category"
-                  tickLine={false}
-                  tickMargin={10}
-                  axisLine={false}
-                  tickFormatter={(value) => value.slice(0, 3)}
-                />
-
-                <ChartTooltip
-                  cursor={false}
-                  content={<ChartTooltipContent hideLabel />}
-                />
-
-                <Bar
-                  dataKey="desktop"
-                  fill="var(--color-desktop)"
-                  radius={5}
-                />
-              </BarChart>
-            </ChartContainer>
+            {loading ? (
+              <div className="text-sm text-muted-foreground">Loading...</div>
+            ) : error ? (
+              <div className="text-sm text-red-600">{error}</div>
+            ) : (
+              <ChartContainer config={chartConfig}>
+                <BarChart
+                  accessibilityLayer
+                  data={mostCommented}
+                  layout="vertical"
+                  margin={{ left: 0 }}
+                >
+                  <XAxis type="number" dataKey="value" hide />
+                  <YAxis
+                  className="text-2xl font-bold"
+                    dataKey="label"
+                    type="category"
+                    tickLine={false}
+                    tickMargin={10}
+                    axisLine={false}
+                    width={180}
+                    tickFormatter={(value) =>
+                      typeof value === "string" ? value.slice(0, 12) : String(value)
+                    }
+                  />
+                  <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
+                  <Bar dataKey="value" fill="var(--color-value)" radius={5} />
+                </BarChart>
+              </ChartContainer>
+            )}
           </CardContent>
 
           <CardFooter className="flex-col items-start gap-2 text-sm">
             <div className="flex gap-2 leading-none font-medium">
-              Trending up by 5.2% this month
-              <TrendingUp className="h-4 w-4" />
+              Updated from API <TrendingUp className="h-4 w-4" />
             </div>
-
             <div className="text-muted-foreground leading-none">
-              Showing total visitors for the last 6 months
+              Showing top haiku by comments
             </div>
           </CardFooter>
         </Card>
-        </div>
-      </div>
+    </div>
+    <button onClick={handleLogout} className="bg-red-400 px-3 py-4 text-white font-bold rounded-sm mt-4">ログアウト</button>
     </div>
   )
 }
