@@ -3,9 +3,11 @@
 import Image from "next/image";
 import Link from "next/link";;
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
+  const [loading,setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const handleEmail = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -14,15 +16,22 @@ export default function ForgotPasswordPage() {
 
   const handleForgotPassword = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault()
-    try {
-        const response = await fetch("api/auth/forgot-password",{
-            method : "POST",
-            headers: { 'Content-Type': 'application/json' },
-            body : JSON.stringify({email})
-        })
-    }catch (e:any) {
-        setError(e?.message ?? "失敗しましたしばらくお待ちください。")
+    
+    setLoading(true)
+    const response = await fetch("api/auth/forgot-password",{
+        method : "POST",
+        headers: { 'Content-Type': 'application/json' },
+        body : JSON.stringify({email})
+    })
+
+    setLoading(false)
+    if (response.ok){
+      const router = useRouter()
+      router.push(`/verify-token?email=${email}`)
+    }else {
+      setError("エラーが発生した、しばらくお待ちください。")
     }
+    
   }
 
   return (
@@ -61,7 +70,7 @@ export default function ForgotPasswordPage() {
         )}
 
         <button
-          className="bg-lime-green text-white p-4 rounded-md shadow-md w-3/4 mt-4 mb-4 hover:ring-2 hover:ring-teal"
+          className={`text-white p-4 rounded-md shadow-md w-3/4 mt-4 mb-4 hover:ring-2 hover:ring-teal ${loading ? `bg-gray-500` : `bg-lime-green`}`}
           onClick={handleForgotPassword}
         >
           確認
