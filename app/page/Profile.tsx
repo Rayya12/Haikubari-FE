@@ -103,7 +103,7 @@ export default function Profile() {
     if (value === ""){
       setErr("ユーサネームを入れて下さい")
     }
-    if (value.length !=0 ){
+    if (value.length >= 0 && value.length<=15 ){
       setUsername(value)  
     }
      

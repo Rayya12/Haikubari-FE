@@ -27,7 +27,7 @@ export async function  handleRegister(prevState : {error?:string} | null,formDat
     }
 
     if (!usernameRegex.test(username)){
-        return {error:"ユーサネームは文字と数字のみ"}
+        return {error:"ユーサネームは文字と数字のみ(長さは12文字です)"}
     }
 
     if (!email){
