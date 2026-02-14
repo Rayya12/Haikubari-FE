@@ -90,18 +90,18 @@ export default function VerifOTP() {
                 <div className="flex justify-start w-3/4">
                     <label htmlFor="token" className="font-bold">トークン</label>
                 </div>
-                <input type="text" required id="token" name="token" className="flex p-2 border border-black text-black w-3/4 rounded-md" value={token} onChange={handleToken}/>
+                <input type="text" required id="token" name="token" className="flex p-2 border border-black text-black w-3/4 rounded-md focus:outline-1 focus:outline-lime-green" value={token} onChange={handleToken}/>
 
 
                 <div className="flex justify-start w-3/4 mt-2">
                     <label htmlFor="password" className="font-bold">パスワード</label>
                 </div>
-                <input type="text" required id="password" name="password" className="flex p-2 border border-black text-black w-3/4 rounded-md" value={password} onChange={handlePassword}/>
+                <input type="password" required id="password" name="password" className="flex p-2 border border-black text-black w-3/4 rounded-md focus:outline-1 hover:outline-lime-green" value={password} onChange={handlePassword}/>
 
                 <div className="flex justify-start w-3/4 mt-2">
                     <label htmlFor="passwordC" className="font-bold">パスワード確認</label>
                 </div>
-                <input type="text" required id="passwordC" name="passwordC" className="flex p-2 border border-black text-black w-3/4 rounded-md" value={passwordConfirm} onChange={handleConfirmPassword}/>
+                <input type="password" required id="passwordC" name="passwordC" className="flex p-2 border border-black text-black w-3/4 rounded-md focus:outline-1 hover:outline-lime-green" value={passwordConfirm} onChange={handleConfirmPassword}/>
                 </div>
                 {error && (
                 <div className="flex w-3/4 items-center justify-center bg-red-300 border-red-700 text-red-950 rounded-md p-2 mt-2">{error}</div>
