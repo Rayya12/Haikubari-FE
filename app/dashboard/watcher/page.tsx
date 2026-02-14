@@ -42,6 +42,7 @@ export default function WatcherDashboard() {
   const [mostLiked, setMostLiked] = useState<Array<{ label: string; value: number }>>([])
   const [mostCommented, setMostCommented] = useState<Array<{ label: string; value: number }>>([])
   const [loading, setLoading] = useState(true)
+  const [sort,setSorted] = useState<"desc" | "asc">("desc")
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
@@ -53,8 +54,8 @@ export default function WatcherDashboard() {
         setError(null)
 
         const [likeRes, commentRes] = await Promise.all([
-          fetch("/api/haiku/most-like?sort=desc", { method: "GET", cache: "no-store" }),
-          fetch("/api/haiku/most-comments?sort=desc", { method: "GET", cache: "no-store" }),
+          fetch(`/api/haiku/most-like?sort=${sort}`, { method: "GET", cache: "no-store" }),
+          fetch(`/api/haiku/most-comments?sort=${sort}`, { method: "GET", cache: "no-store" }),
         ])
 
         if (!likeRes.ok) throw new Error("Failed to fetch most-like")
@@ -93,16 +94,21 @@ export default function WatcherDashboard() {
     return () => {
       cancelled = true
     }
-  }, [])
+  }, [sort])
 
   return (
     <div className="flex flex-col bg-white min-h-screen items-center justify-center">
         <h1 className="flex text-4xl font-bold text-ateneo-blue mb-8">監視者のダッシュボード</h1>
+        <select onChange={(e)=>{setSorted(e.target.value as "desc" | "asc")}} name="sort" id="sort" className="bg-lime-green px-3 py-2 rounded-md text-white font-bold outline-0 text-2xl mb-4">
+            <option value="desc">降順</option>
+            <option value="asc">上昇</option>
+        </select>
+    
         {/* Most liked */}
         <div className="flex w-full space-x-4 items-center justify-center">
         <Card className="w-full max-w-xl">
           <CardHeader>
-            <CardTitle className="text-2xl">最もいいねされた俳句</CardTitle>
+            <CardTitle className="text-2xl">{sort == "desc" ? `最も多いいいねされた俳句`:`最も少ないいいねされた俳句`}</CardTitle>
           </CardHeader>
 
           <CardContent>
@@ -141,16 +147,13 @@ export default function WatcherDashboard() {
             <div className="flex gap-2 leading-none font-medium">
               俳句張り実際データからとりました <TrendingUp className="h-4 w-4" />
             </div>
-            <div className="text-muted-foreground leading-none">
-              Showing top haiku by likes
-            </div>
           </CardFooter>
         </Card>
 
         {/* Most commented */}
         <Card className="w-full max-w-xl">
           <CardHeader>
-            <CardTitle className="text-2xl">最もコメントされた俳句</CardTitle>
+            <CardTitle className="text-2xl">{sort == "desc" ?`最も多いコメントされた俳句` : "最も少ないコメントされた俳句"}</CardTitle>
           </CardHeader>
 
           <CardContent>
@@ -188,10 +191,7 @@ export default function WatcherDashboard() {
 
           <CardFooter className="flex-col items-start gap-2 text-sm">
             <div className="flex gap-2 leading-none font-medium">
-              Updated from API <TrendingUp className="h-4 w-4" />
-            </div>
-            <div className="text-muted-foreground leading-none">
-              Showing top haiku by comments
+              俳句張り実際データからとりました <TrendingUp className="h-4 w-4" />
             </div>
           </CardFooter>
         </Card>
