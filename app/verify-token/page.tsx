@@ -1,6 +1,7 @@
 'use client'
 import { useSearchParams } from "next/navigation"
-import { ChangeEvent, useActionState, useState } from "react" 
+import { useState } from "react" 
+import { useRouter } from "next/navigation"
 
 
 export default function VerifOTP() {
@@ -56,17 +57,22 @@ export default function VerifOTP() {
         }
 
 
-        try {
-            setLoading(true)
-            const response = await fetch('/api/auth/verify-token', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body : JSON.stringify({token,password})})
-        }catch (e:any){
+        
+        setLoading(true)
+        const response = await fetch('/api/auth/verify-token', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body : JSON.stringify({token,password})})
+       
+        setLoading(false)
+        if (!response.ok){
             setError("トークンが間違いました")
-        }finally{
-            setLoading(false)
+        }else {
+            const router = useRouter()
+            router.push("/verify-token/success")
         }
+        
+        
     }
 
 

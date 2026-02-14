@@ -14,10 +14,10 @@ export async function POST(request: Request) {
     })
 
     if (!response.ok){
-        throw Error("エラーが発生しましたしばらくお待ちください。")
+        return new Response(JSON.stringify({error : "トークンが間違いました"}))
     }
 
-    redirect(`/verify-token/success`)
+    return Response.json({success : true})
 
 
 }
