@@ -9,6 +9,7 @@ export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
   const [loading,setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const router = useRouter()
 
   const handleEmail = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value);
@@ -26,7 +27,7 @@ export default function ForgotPasswordPage() {
 
     setLoading(false)
     if (response.ok){
-      const router = useRouter()
+      
       router.push(`/verify-token?email=${email}`)
     }else {
       setError("エラーが発生した、しばらくお待ちください。")

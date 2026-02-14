@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation"
 export default function VerifOTP() {
     const searchParams = useSearchParams()
 
+    const router = useRouter()
     const [loading,setLoading] = useState(false)
     const [token,seToken] = useState("")
     const [error,setError] = useState<string  | null>(null)
@@ -68,7 +69,7 @@ export default function VerifOTP() {
         if (!response.ok){
             setError("トークンが間違いました")
         }else {
-            const router = useRouter()
+            
             router.push("/verify-token/success")
         }
         
