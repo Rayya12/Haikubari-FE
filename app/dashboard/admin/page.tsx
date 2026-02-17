@@ -1,18 +1,16 @@
+"use client";
+
 import { useEffect, useState } from "react";
-import {useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { handleLogout } from "@/app/lib/action";
-import { redirect } from "next/navigation";
+import { userResponse } from "@/app/lib/type";
 
+const STATUS_OPTIONS = ["pending", "accepted", "suspended"];
 
-
-const STATUS_OPTIONS = ["PENDING", "APPROVED", "REJECTED", "SUSPENDED"];
-
-const statusStyle = (status : any) => {
+const statusStyle = (status: any) => {
   switch ((status || "").toLowerCase()) {
-    case "approved":
+    case "accepted":
       return "bg-green-500 text-white";
-    case "rejected":
-      return "bg-red-500 text-white";
     case "suspend":
     case "suspended":
       return "bg-rose-500 text-white";
@@ -25,50 +23,74 @@ const statusStyle = (status : any) => {
 export default function ListTentor() {
   const searchParams = useSearchParams();
   const router = useRouter();
+
   const q = searchParams.get("q") || "";
   const [input, setInput] = useState(q);
 
-  const [watcher, setWatcher] = useState([]);
+  const [watcher, setWatcher] = useState<userResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [errMsg, setErrMsg] = useState("");
 
+  // ✅ only disable the button that is clicked
+  const [loadingId, setLoadingId] = useState<string | null>(null);
+
   const handleButtonLogout = async () => {
-    await handleLogout()
+    await handleLogout();
   };
 
+  // ✅ Client-side navigation (no redirect() in client component)
   const handleSearch = () => {
     const trimmed = input.trim();
+    const params = new URLSearchParams(searchParams.toString());
+
     if (trimmed === "") {
-      const params = new URLSearchParams(searchParams.toString());
-      params.delete("q")
-      redirect("/dashboard/admin");
-    } else {
-      const params = new URLSearchParams(searchParams.toString());
-      params.set("q",trimmed)
-      redirect(`/dashboard/admin?q=${encodeURIComponent(trimmed)}`);
+      params.delete("q");
+      router.push("/dashboard/admin");
+      return;
     }
+
+    params.set("q", trimmed);
+    router.push(`/dashboard/admin?q=${encodeURIComponent(trimmed)}`);
   };
 
   useEffect(() => {
     setInput(q);
   }, [q]);
 
+  // ✅ Fetch watchers
   useEffect(() => {
     let active = true;
 
     const fetchData = async () => {
-      try {
-        setLoading(true);
-        setErrMsg("");
+      setLoading(true);
+      setErrMsg("");
 
-        
-      } catch (e:any) {
-        console.error(e);
-        setErrMsg(
-          e?.message || "監視者のデータがロードできませんでした"
-        );
+      try {
+        const response = await fetch("/api/admin/getAllWatcher", {
+          method: "GET",
+          cache: "no-store",
+        });
+
+        // 🔒 avoid response.json() crash when body is empty/non-json
+        const contentType = response.headers.get("content-type") || "";
+        const maybeJson =
+          contentType.includes("application/json") ? await response.json() : null;
+
+        if (!response.ok) {
+          const msg =
+            maybeJson?.message ??
+            maybeJson?.detail ??
+            "データをロードできませんでした";
+          if (active) setErrMsg(msg);
+          return;
+        }
+
+        const listWatcher = maybeJson?.wachers ?? [];
+        if (active) setWatcher(listWatcher);
+      } catch (e: any) {
+        if (active) setErrMsg(e?.message ?? "データをロードできませんでした");
       } finally {
-        active && setLoading(false);
+        if (active) setLoading(false);
       }
     };
 
@@ -78,31 +100,47 @@ export default function ListTentor() {
     };
   }, [q]);
 
-  const handleChangeStatus = async (id, newStatus) => {
-    const prev = tentors;
-    setTentors((s) =>
-      s.map((x) => (x.id === id ? { ...x, status: newStatus } : x))
-    );
+  // ✅ Change status with per-row loading
+  const handleChangeStatus = async (id: string, email: string, status: string) => {
+    setErrMsg("");
+    setLoadingId(id);
+
     try {
-      await axios.post(
-        `${BACKEND_URL}/api/tentors/${id}/status`,
-        { status: newStatus },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
+      const response = await fetch("/api/admin/changeStatus", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ id, email, status }),
+      });
+
+      // 🔒 avoid response.json() crash
+      const contentType = response.headers.get("content-type") || "";
+      const maybeJson =
+        contentType.includes("application/json") ? await response.json() : null;
+
+      if (!response.ok) {
+        const msg =
+          maybeJson?.message ??
+          maybeJson?.detail ??
+          "ステータス変更に失敗しました";
+        setErrMsg(msg);
+        return;
+      }
+
+      alert("ステータス変化がせいこうしました！");
+
+
+      // Option B: optimistic update (recommended)
+      setWatcher((prev) =>
+        prev.map((u) => (u.id === id ? { ...u, status } : u))
       );
-    } catch (e) {
-      console.error(e);
-      setErrMsg(
-        e?.response?.data?.message || "Gagal mengubah status verifikasi."
-      );
-      setTentors(prev);
+    } catch (e: any) {
+      setErrMsg(e?.message ?? "ステータス変更に失敗しました");
+    } finally {
+      setLoadingId(null);
     }
   };
-
-
 
   return (
     <div className="min-h-screen bg-bg text-textBase transition-colors duration-300">
@@ -160,44 +198,92 @@ export default function ListTentor() {
           <div className="flex h-48 items-center justify-center text-textMuted">
             ロードする
           </div>
-        ) : tentors.length === 0 ? (
+        ) : watcher.length === 0 ? (
           <div className="text-textMuted">Belum ada data tentor.</div>
         ) : (
           <ul className="flex flex-col gap-4">
-            {tentors.map((t) => (
-              <li
-                key={t.id}
-                className="flex items-center justify-between rounded-2xl border border-border bg-white dark:bg-slate-900 px-4 py-4 shadow-sm transition-colors duration-300"
-              >
-                {/* Left: info */}
-                <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
-                  <div className="min-w-[220px] font-semibold text-textBase">
-                    {t.name}
-                  </div>
-                  <div className="text-textMuted">
-                    <span className="font-medium">IPK:</span>{" "}
-                    {Number(t.ipk || 0).toFixed(2)}
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-textMuted">
-                      監視者のステータス:
-                    </span>
-                    <span
-                      className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-sm font-semibold ${statusStyle(
-                        t.status
-                      )}`}
-                    >
-                      {t.status}
-                    </span>
-                  </div>
-                </div>
+            {watcher.map((t) => {
+              const isBtnLoading = loadingId === t.id;
 
-                {/* Right: actions */}
-                <div className="flex items-center gap-3">
+              const baseBtn =
+                "flex px-2 py-3 font-bold text-white rounded-md transition-colors";
+              const disabledBtn = "bg-gray-400 cursor-not-allowed";
+              const acceptBtn = "bg-lime-green hover:bg-lime-700";
+              const suspendBtn = "bg-red-400 hover:bg-red-700";
 
-                </div>
-              </li>
-            ))}
+              return (
+                <li
+                  key={t.id}
+                  className="flex items-center justify-between rounded-2xl border border-border bg-white dark:bg-slate-900 px-4 py-4 shadow-sm transition-colors duration-300"
+                >
+                  {/* Left: info */}
+                  <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
+                    <div className="min-w-[220px] font-semibold text-textBase">
+                      {t.username}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-textMuted">監視者のステータス:</span>
+                      <span
+                        className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-sm font-semibold ${statusStyle(
+                          t.status
+                        )}`}
+                      >
+                        {t.status}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Right: actions */}
+                  <div className="flex items-center gap-3">
+                    {t.status === "pending" && (
+                      <button
+                        disabled={isBtnLoading}
+                        className={`${baseBtn} ${
+                          isBtnLoading ? disabledBtn : acceptBtn
+                        }`}
+                        onClick={() =>
+                          handleChangeStatus(t.id, t.email.toString(), "accepted")
+                        }
+                      >
+                        {isBtnLoading ? "処理中..." : "承認します。"}
+                      </button>
+                    )}
+
+                    {t.status === "accepted" && (
+                      <button
+                        disabled={isBtnLoading}
+                        className={`${baseBtn} ${
+                          isBtnLoading ? disabledBtn : suspendBtn
+                        }`}
+                        onClick={() =>
+                          handleChangeStatus(
+                            t.id,
+                            t.email.toString(),
+                            "suspended"
+                          )
+                        }
+                      >
+                        {isBtnLoading ? "処理中..." : "中断します。"}
+                      </button>
+                    )}
+
+                    {t.status === "suspended" && (
+                      <button
+                        disabled={isBtnLoading}
+                        className={`${baseBtn} ${
+                          isBtnLoading ? disabledBtn : acceptBtn
+                        }`}
+                        onClick={() =>
+                          handleChangeStatus(t.id, t.email.toString(), "accepted")
+                        }
+                      >
+                        {isBtnLoading ? "処理中..." : "承認します。"}
+                      </button>
+                    )}
+                  </div>
+                </li>
+              );
+            })}
           </ul>
         )}
       </main>

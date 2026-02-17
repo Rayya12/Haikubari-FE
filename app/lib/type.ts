@@ -43,8 +43,10 @@ export type getByIDResponse = {
 }
 
 export type userResponse = {
+  id: string
   username : String,
   email:String,
+  status: String,
   photo_url : String | null,
   file_name : String | null,
   file_type : String | null,
