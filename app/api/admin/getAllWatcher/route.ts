@@ -3,7 +3,11 @@ import { cookies } from "next/headers";
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL
 
 
-export async function GET(){
+export async function GET(request : Request){
+
+    const {searchParams} = new URL(request.url);
+    const q = searchParams.get("q");
+
     const kukis = await cookies();
     const CToken = kukis.get("access_token")?.value
 
@@ -11,7 +15,7 @@ export async function GET(){
         return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
     }
 
-    const response = await fetch(`${BACKEND_URL}/users/watchers`,{
+    const response = await fetch(`${BACKEND_URL}/users/watchers?q=${q}`,{
         method : "GET",
         headers : {
             "Content-Type" : "application/json",

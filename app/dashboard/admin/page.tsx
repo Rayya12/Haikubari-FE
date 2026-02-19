@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { handleLogout } from "@/app/lib/action";
 import { userResponse } from "@/app/lib/type";
+import { stat } from "fs";
 
 const STATUS_OPTIONS = ["pending", "accepted", "suspended"];
 
@@ -20,7 +21,7 @@ const statusStyle = (status: any) => {
   }
 };
 
-export default function ListTentor() {
+export default function ListWatcher() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -66,7 +67,7 @@ export default function ListTentor() {
       setErrMsg("");
 
       try {
-        const response = await fetch("/api/admin/getAllWatcher", {
+        const response = await fetch(`/api/admin/getAllWatcher?q=${q}`, {
           method: "GET",
           cache: "no-store",
         });
@@ -130,11 +131,7 @@ export default function ListTentor() {
 
       alert("ステータス変化がせいこうしました！");
 
-
-      // Option B: optimistic update (recommended)
-      setWatcher((prev) =>
-        prev.map((u) => (u.id === id ? { ...u, status } : u))
-      );
+      setWatcher(prev => prev.map((e)=>e.id == id ? {...e,status} : e))
     } catch (e: any) {
       setErrMsg(e?.message ?? "ステータス変更に失敗しました");
     } finally {
@@ -145,18 +142,18 @@ export default function ListTentor() {
   return (
     <div className="min-h-screen bg-bg text-textBase transition-colors duration-300">
       {/* Header */}
-      <header className="bg-header shadow-md">
+      <header className="bg-header shadow-md bg-lime-green">
         <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-4">
           <div className="flex items-center gap-3">
-            <img src="/images/gettentor.png" alt="GetTentor" className="h-8" />
+            <img src="/blacklogo.png" alt="GetTentor" className="h-8" />
           </div>
           <div className="flex items-center p-2 gap-4">
-            <div className="text-textBase font-semibold">Admin</div>
+            <div className="text-textBase font-semibold">アドミン</div>
             <button
               onClick={handleButtonLogout}
               className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md font-semibold transition-colors duration-200"
             >
-              Logout
+              ログアウト
             </button>
           </div>
         </div>
@@ -166,7 +163,7 @@ export default function ListTentor() {
       <div className="flex justify-center mt-6">
         <input
           type="text"
-          placeholder="Masukkan kata kunci yang ingin dicari"
+          placeholder="監視者を探す"
           className="w-[400px] px-4 py-2 border border-border rounded-l-md shadow-sm bg-bg text-textBase focus:outline-none focus:ring-2 focus:ring-cta transition-colors duration-200"
           value={input}
           onChange={(e) => setInput(e.target.value)}
@@ -175,7 +172,7 @@ export default function ListTentor() {
           }}
         />
         <button
-          className="bg-cta hover:bg-ctaSoft text-white px-4 py-2 rounded-r-md font-semibold transition-colors duration-200"
+          className="bg-ateneo-blue hover:bg-gray-800 text-white px-4 py-2 rounded-r-md font-semibold transition-colors duration-200 hover:shadow-md"
           onClick={handleSearch}
         >
           検索 🔍
@@ -185,7 +182,7 @@ export default function ListTentor() {
       {/* Body */}
       <main className="mx-auto w-full max-w-4xl px-6 py-8">
         <h2 className="text-3xl font-semibold mb-4 text-cta">
-          {q ? `Hasil Pencarian untuk "${q}"` : "List Tentor"}
+          {q ? `探す結果はこちら "${q}"` : "監視者のリスト"}
         </h2>
 
         {errMsg && (
@@ -199,7 +196,7 @@ export default function ListTentor() {
             ロードする
           </div>
         ) : watcher.length === 0 ? (
-          <div className="text-textMuted">Belum ada data tentor.</div>
+          <div className="text-textMuted">監視者はまだいません</div>
         ) : (
           <ul className="flex flex-col gap-4">
             {watcher.map((t) => {
