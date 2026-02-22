@@ -10,7 +10,7 @@ export async function GET(req: Request) {
 
   const token = kukis.get("access_token")?.value; // opsional
 
-  const url = `${backendURL}/haikus?${searchParams.toString()}`;
+  const url = `${backendURL}/haikus/?${searchParams.toString()}`;
 
   const res = await fetch(url, {
     headers: token ? { Authorization: `Bearer ${token}` } : undefined,
