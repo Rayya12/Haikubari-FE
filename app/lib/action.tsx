@@ -258,7 +258,26 @@ export async function  handleLogin(prevState:{error?:String} | null,formData:For
         path:"/"
     })
 
-    redirect("/dashboard")   
+    const user = await fetch("/api/users/me",{
+        method : "GET",
+        cache : "no-store"
+    });
+
+    const me = await user.json();
+    if (me.role == "admin" || me.role == "common"){
+        redirect("/dashboard") ;
+    }else{
+        if (me.status != "accepted"){
+            return {error : "アドミンに確認してからログインできます"}
+        }else{
+            redirect("/dashboard")
+        }
+    }
+
+
+    
+
+      
 }
 
 export async function handleLogout(){
