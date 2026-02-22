@@ -258,6 +258,8 @@ export async function  handleLogin(prevState:{error?:String} | null,formData:For
         path:"/"
     })
 
+    
+
     const user = await fetch(`${backendURL}/users/me`, {
         cache: "no-store",
         headers: {
@@ -270,9 +272,8 @@ export async function  handleLogin(prevState:{error?:String} | null,formData:For
     }
 
     const me = await user.json();
-    console.log(me.status)
 
-    if (me.role === "watcher" && me.status !== "WatcherEnum.accepted") {
+    if (me.role === "watcher" && me.status !== "accepted") {
 
         return { error: "アドミンに確認してからログインできます" };
     }
