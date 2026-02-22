@@ -170,7 +170,7 @@ export async function handleVerifyOTP(prevState:{error?:string},formData:FormDat
         return {error:"正しいOTPを入れて下さい"}
     }
 
-    redirect(`verify-otp/success`)
+    redirect(`/verify-otp/success`)
 
 
 }
