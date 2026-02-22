@@ -50,7 +50,7 @@ export default function Home() {
           {/* Right: Image */}
           <div className="flex w-full max-w-sm items-center justify-center md:max-w-md">
             <Image
-              src="/Haikubariman.png"
+              src="/HaikubariMan.png"
               alt="Haikubari Hero"
               width={420}
               height={420}

@@ -96,7 +96,6 @@ export default function AllHaikuList() {
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
               onKeyDown={(e)=>{
-                e.preventDefault()
                 if (e.key == "Enter"){
                   setParams({q:searchInput, page:1})
                   setSearchInput("")
