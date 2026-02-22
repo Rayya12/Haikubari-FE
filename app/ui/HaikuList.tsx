@@ -1,16 +1,41 @@
-"use client"
-import { useRouter } from "next/navigation";
-import { useSearchParams } from "next/navigation";
-import { useState,useMemo, useEffect } from "react";
-import { Haiku,MyHaikusResponse } from "../lib/type";
-import { getMyHaikus } from "../lib/action";
-import { json } from "stream/consumers";
+"use client";
+
+import { useRouter, useSearchParams } from "next/navigation";
+import { useState, useMemo, useEffect } from "react";
+import { MyHaikusResponse } from "../lib/type";
 import HaikuCard from "@/app/ui/HaikuCard";
 import Link from "next/link";
-import { Pavanam } from "next/font/google";
 
 function clamp(n: number, min: number, max: number) {
   return Math.max(min, Math.min(max, n));
+}
+
+async function fetchMyHaikus(params: {
+  page: number;
+  page_size: number;
+  q?: string;
+  sort: "created_at" | "likes";
+  order: "asc" | "desc";
+}): Promise<MyHaikusResponse> {
+  const sp = new URLSearchParams();
+
+  sp.set("page", String(params.page));
+  sp.set("page_size", String(params.page_size));
+  if (params.q) sp.set("q", params.q);
+  sp.set("sort", params.sort);
+  sp.set("order", params.order);
+
+  const res = await fetch(`/api/haiku/mine?${sp.toString()}`, {
+    method: "GET",
+    cache: "no-store",
+  });
+
+  if (!res.ok) {
+    const txt = await res.text().catch(() => "");
+    throw new Error(`Failed to fetch my haikus (${res.status}): ${txt}`);
+  }
+
+  return (await res.json()) as MyHaikusResponse;
 }
 
 export default function MyHaikuPage() {
@@ -28,16 +53,22 @@ export default function MyHaikuPage() {
   const [err, setErr] = useState<string | null>(null);
   const [searchInput, setSearchInput] = useState(q);
 
-
   useEffect(() => {
     let cancelled = false;
 
     async function run() {
       setLoading(true);
       setErr(null);
+
       try {
-        const json = await getMyHaikus({ page:page, page_size: pageSize, q: q || undefined, sort:sort, order:order });
-        console.log("Fetched my haikus:", json);
+        const json = await fetchMyHaikus({
+          page,
+          page_size: pageSize,
+          q: q || undefined,
+          sort,
+          order,
+        });
+
         if (!cancelled) setData(json);
       } catch (e: any) {
         if (!cancelled) setErr(e?.message ?? "Failed to load");
@@ -52,15 +83,26 @@ export default function MyHaikuPage() {
     };
   }, [page, pageSize, q, sort, order]);
 
-  function setParams(next: Partial<{ page: number; page_size: number; q: string; sort: "created_at" | "likes"; order: "asc" | "desc" }>) {
+  function setParams(
+    next: Partial<{
+      page: number;
+      page_size: number;
+      q: string;
+      sort: "created_at" | "likes";
+      order: "asc" | "desc";
+    }>
+  ) {
     const params = new URLSearchParams(sp.toString());
 
     if (next.page !== undefined) params.set("page", String(next.page));
-    if (next.page_size !== undefined) params.set("page_size", String(next.page_size));
+    if (next.page_size !== undefined)
+      params.set("page_size", String(next.page_size));
+
     if (next.q !== undefined) {
       if (next.q) params.set("q", next.q);
       else params.delete("q");
     }
+
     if (next.sort !== undefined) params.set("sort", next.sort);
     if (next.order !== undefined) params.set("order", next.order);
 
@@ -70,7 +112,6 @@ export default function MyHaikuPage() {
   const totalPages = data?.total_pages ?? 0;
   const safePage = totalPages ? clamp(page, 1, totalPages) : page;
 
-  // simple pagination window (maks 5 tombol)
   const pageButtons = useMemo(() => {
     const tp = totalPages;
     if (!tp) return [];
