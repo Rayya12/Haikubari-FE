@@ -258,21 +258,24 @@ export async function  handleLogin(prevState:{error?:String} | null,formData:For
         path:"/"
     })
 
-    const user = await fetch("/api/users/me",{
-        method : "GET",
-        cache : "no-store"
+    const user = await fetch(`/api/users/me`, {
+        cache: "no-store",
+        headers: {
+            cookie: cookies().toString()
+        }
     });
 
-    const me = await user.json();
-    if (me.role == "admin" || me.role == "common"){
-        redirect("/dashboard") ;
-    }else{
-        if (me.status != "accepted"){
-            return {error : "アドミンに確認してからログインできます"}
-        }else{
-            redirect("/dashboard")
-        }
+    if (!user.ok) {
+        return { error: "Unauthorized" };
     }
+
+    const me = await user.json();
+
+    if (me.role === "watcher" && me.status !== "accepted") {
+        return { error: "アドミンに確認してからログインできます" };
+    }
+
+    redirect("/dashboard");
 
 
     
