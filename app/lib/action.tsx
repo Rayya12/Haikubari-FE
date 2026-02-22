@@ -271,7 +271,7 @@ export async function  handleLogin(prevState:{error?:String} | null,formData:For
 
     const me = await user.json();
 
-    if (me.role === "watcher" && me.status !== "accepted") {
+    if (me.role === "watcher" && me.status !== "WatcherEnum.accepted") {
         return { error: "アドミンに確認してからログインできます" };
     }
 
