@@ -258,10 +258,10 @@ export async function  handleLogin(prevState:{error?:String} | null,formData:For
         path:"/"
     })
 
-    const user = await fetch(`/api/users/me`, {
+    const user = await fetch(`${backendURL}/users/me`, {
         cache: "no-store",
         headers: {
-            cookie: cookies().toString()
+            Authorization : `Bearer ${data.access_token}`
         }
     });
 
